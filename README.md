@@ -28,6 +28,10 @@ Use it when you want:
 - blocked-state reporting and resumable context;
 - custom YAML workflows and custom role prompts.
 
+<p align="center">
+  <img src="assets/agentflow-workflow.svg" alt="Animated agentflow workflow diagram" width="100%" />
+</p>
+
 ## Repository layout
 
 ```txt

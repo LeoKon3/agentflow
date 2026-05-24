@@ -1,0 +1,26 @@
+name: quick-no-review
+description: Make a small change and require independent testing, but skip final review.
+
+roles:
+  developer:
+    title: Developer
+    uses: builtin/developer
+    can_edit: true
+    can_run_commands: true
+    pass_to: tester
+
+  tester:
+    title: Tester
+    uses: builtin/tester
+    can_edit: true
+    can_run_commands: true
+    pass_to: done
+    fail_to: developer
+
+flow:
+  start: developer
+
+rules:
+  max_loops: 2
+  require_tests: true
+  require_final_review: false

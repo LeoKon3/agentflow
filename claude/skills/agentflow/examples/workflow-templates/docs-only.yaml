@@ -1,0 +1,30 @@
+name: docs-only
+description: Update documentation with a documentation-focused implementation and review gate.
+
+roles:
+  docs-writer:
+    title: Docs Writer
+    uses: builtin/developer
+    prompt: |
+      Focus only on documentation changes. Keep edits concise, accurate, and scoped to the user's request. Do not change production code unless the user explicitly asks for code changes.
+    can_edit: true
+    can_run_commands: true
+    pass_to: docs-reviewer
+
+  docs-reviewer:
+    title: Docs Reviewer
+    uses: builtin/reviewer
+    prompt: |
+      Review documentation for correctness, clarity, broken references, outdated instructions, and mismatch with the current project. Request changes when documentation is ambiguous, misleading, or not supported by the repository.
+    can_edit: false
+    can_run_commands: true
+    pass_to: done
+    fail_to: docs-writer
+
+flow:
+  start: docs-writer
+
+rules:
+  max_loops: 2
+  require_tests: false
+  require_final_review: true

@@ -1,0 +1,42 @@
+name: security-hotfix
+description: Ship a focused security fix with security review, verification, and senior approval.
+
+roles:
+  developer:
+    title: Developer
+    uses: builtin/developer
+    can_edit: true
+    can_run_commands: true
+    pass_to: security-reviewer
+
+  security-reviewer:
+    title: Security Reviewer
+    uses: builtin/security-reviewer
+    can_edit: false
+    can_run_commands: true
+    pass_to: tester
+    fail_to: developer
+
+  tester:
+    title: Tester
+    uses: builtin/tester
+    can_edit: true
+    can_run_commands: true
+    pass_to: senior-reviewer
+    fail_to: developer
+
+  senior-reviewer:
+    title: Senior Reviewer
+    uses: builtin/senior-reviewer
+    can_edit: false
+    can_run_commands: true
+    pass_to: done
+    fail_to: developer
+
+flow:
+  start: developer
+
+rules:
+  max_loops: 2
+  require_tests: true
+  require_final_review: true

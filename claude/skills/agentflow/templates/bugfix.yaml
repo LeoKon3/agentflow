@@ -1,0 +1,41 @@
+name: bugfix
+description: Debug and fix a defect with investigation, testing, and final review gates.
+
+roles:
+  investigator:
+    title: Investigator
+    uses: builtin/investigator
+    can_edit: false
+    can_run_commands: true
+    pass_to: developer
+
+  developer:
+    title: Developer
+    uses: builtin/developer
+    can_edit: true
+    can_run_commands: true
+    pass_to: tester
+
+  tester:
+    title: Tester
+    uses: builtin/tester
+    can_edit: true
+    can_run_commands: true
+    pass_to: reviewer
+    fail_to: developer
+
+  reviewer:
+    title: Reviewer
+    uses: builtin/reviewer
+    can_edit: false
+    can_run_commands: true
+    pass_to: done
+    fail_to: developer
+
+flow:
+  start: investigator
+
+rules:
+  max_loops: 3
+  require_tests: true
+  require_final_review: true

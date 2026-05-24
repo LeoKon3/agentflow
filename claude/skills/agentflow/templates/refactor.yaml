@@ -1,0 +1,41 @@
+name: refactor
+description: Improve structure without intended behavior changes, with regression testing and review gates.
+
+roles:
+  architect:
+    title: Architect
+    uses: builtin/architect
+    can_edit: false
+    can_run_commands: true
+    pass_to: developer
+
+  developer:
+    title: Developer
+    uses: builtin/developer
+    can_edit: true
+    can_run_commands: true
+    pass_to: regression-tester
+
+  regression-tester:
+    title: Regression Tester
+    uses: builtin/regression-tester
+    can_edit: true
+    can_run_commands: true
+    pass_to: reviewer
+    fail_to: developer
+
+  reviewer:
+    title: Reviewer
+    uses: builtin/reviewer
+    can_edit: false
+    can_run_commands: true
+    pass_to: done
+    fail_to: developer
+
+flow:
+  start: architect
+
+rules:
+  max_loops: 3
+  require_tests: true
+  require_final_review: true

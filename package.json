@@ -1,6 +1,6 @@
 {
   "name": "@leokon3/agentflow",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Install the AgentFlow Claude Code skill for role-based agent workflows.",
   "type": "module",
   "bin": {

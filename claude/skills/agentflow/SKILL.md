@@ -20,10 +20,20 @@ Supported commands:
 ```txt
 /agentflow list
 /agentflow show <template>
+/agentflow show <template.yaml>
+/agentflow validate <template>
 /agentflow validate <template.yaml>
 /agentflow run <template> "<task>"
 /agentflow run <template.yaml> "<task>"
 ```
+
+Template resolution:
+
+1. Explicit YAML paths are loaded as written.
+2. Named project templates are loaded from `.agentflow/templates/<name>.yaml`.
+3. Built-in templates are loaded from `templates/<name>.yaml`.
+
+Project templates take precedence over built-in templates with the same name.
 
 Built-in templates:
 
@@ -35,41 +45,51 @@ Built-in templates:
 
 Built-in role prompts live in `roles/` and built-in templates live in `templates/`.
 
+Project templates live in `.agentflow/templates/` relative to the user's current project.
+
 If the command is invalid, show the supported command forms and stop.
 
 ## `/agentflow list`
 
-Show built-in templates in this format:
+Show built-in templates and any project templates found in `.agentflow/templates/*.yaml`.
+
+Use this format:
 
 ```txt
+Project templates:
+- strict-bugfix    .agentflow/templates/strict-bugfix.yaml
+
 Built-in templates:
-- bugfix      Investigator → Developer → Tester → Reviewer
-- feature     Architect → Developer → Tester → Reviewer
-- refactor    Architect → Developer → Regression Tester → Reviewer
-- security    Developer → Security Reviewer → Tester → Senior Reviewer
-- quick       Developer → Tester
+- bugfix           Investigator → Developer → Tester → Reviewer
+- feature          Architect → Developer → Tester → Reviewer
+- refactor         Architect → Developer → Regression Tester → Reviewer
+- security         Developer → Security Reviewer → Tester → Senior Reviewer
+- quick            Developer → Tester
 ```
+
+If no project templates exist, show `Project templates: none`.
 
 Do not invent remote or marketplace templates.
 
 ## `/agentflow show <template>`
 
-Load the named built-in template from `templates/`.
+Resolve the template using the template resolution order.
 
 Show:
 
 - Template name.
+- Template source: explicit path, project template, or built-in template.
 - Description.
 - Flow.
 - Rules.
 - Roles.
 - Failure routes.
 
-If the template is unknown, list the built-in template names and stop.
+If the template is unknown, list available project templates and built-in template names, then stop.
 
-## `/agentflow validate <template.yaml>`
+## `/agentflow validate <template>`
 
-Validate only an explicit YAML file path supplied by the user. Do not search arbitrary directories for custom template names.
+Resolve the template using the template resolution order, then validate it. Do not search arbitrary directories for custom template names.
 
 Validation checklist:
 
@@ -103,7 +123,7 @@ Report validation results with concrete field paths when possible. If validation
 
 ## `/agentflow run <template> "<task>"`
 
-Run a built-in template by name or a custom template by explicit YAML path.
+Resolve the template using the template resolution order, then run it for the provided task.
 
 Execution rules:
 

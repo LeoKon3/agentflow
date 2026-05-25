@@ -38,7 +38,7 @@ Claude Code can handle complex work, but larger tasks often need explicit role b
 
 ## Quick start
 
-Requires Claude Code with skill support.
+Requires Claude Code with skill support. `agentflow` works best inside a git repository, especially for workflows that edit code or use Claude Code worktree isolation. Non-git projects can use custom Claude Code `WorktreeCreate` / `WorktreeRemove` hooks, but git is the recommended path.
 
 Copy the skill into your Claude Code skills directory:
 
@@ -61,27 +61,41 @@ Run a custom workflow YAML file:
 /agentflow run ./claude/skills/agentflow/examples/workflow-templates/strict-bugfix.yaml "fix login redirect bug"
 ```
 
+Or place a project template at `.agentflow/templates/strict-bugfix.yaml` and run it by name:
+
+```txt
+/agentflow run strict-bugfix "fix login redirect bug"
+```
+
 ## Built-in workflows
 
 | Template | Flow | Use when |
 | --- | --- | --- |
-| `bugfix` | Investigator → Developer → Tester → Reviewer | You need root cause, fix, tests, and review. |
-| `feature` | Architect → Developer → Tester → Reviewer | You need a small plan before implementation. |
-| `refactor` | Architect → Developer → Regression Tester → Reviewer | Behavior should stay unchanged. |
-| `security` | Developer → Security Reviewer → Tester → Senior Reviewer | Auth, tokens, permissions, webhooks, or payment boundaries are involved. |
-| `quick` | Developer → Tester | The change is small but still needs verification. |
+| `bugfix` | Investigator → Developer → Tester → Reviewer | Diagnose, fix, verify, and review a defect. |
+| `feature` | Architect → Developer → Tester → Reviewer | Design, build, verify, and review new behavior. |
+| `refactor` | Architect → Developer → Regression Tester → Reviewer | Change structure while proving behavior stays the same. |
+| `security` | Developer → Security Reviewer → Tester → Senior Reviewer | Change security-sensitive code with extra review. |
+| `quick` | Developer → Tester | Make a small implementation with focused verification. |
 
 ## Commands
 
 | Command | Purpose |
 | --- | --- |
-| `/agentflow list` | Show built-in workflows. |
+| `/agentflow list` | Show built-in and project workflows. |
 | `/agentflow show <template>` | Inspect a workflow. |
-| `/agentflow validate <template.yaml>` | Validate a custom workflow file. |
-| `/agentflow run <template> "<task>"` | Run a built-in workflow. |
-| `/agentflow run <template.yaml> "<task>"` | Run a custom workflow file. |
+| `/agentflow validate <template>` | Validate a workflow template. |
+| `/agentflow run <template> "<task>"` | Run a workflow by name. |
+| `/agentflow run <template.yaml> "<task>"` | Run a workflow file by path. |
 
-Built-in templates are addressed by name. Custom templates are currently addressed by explicit YAML file path.
+Template resolution order:
+
+1. Explicit YAML paths are loaded as written.
+2. Project templates are loaded from `.agentflow/templates/<name>.yaml`.
+3. Built-in templates are loaded from the installed skill's `templates/<name>.yaml`.
+
+Project templates take precedence over built-in templates with the same name.
+
+`.agentflow/templates/` is project configuration for reusable workflow templates and can be committed for team use. It is separate from `.claude/skills/agentflow/`, which is the Claude Code skill installation directory and should not hold user custom templates.
 
 ## Workflow decisions
 
@@ -134,11 +148,22 @@ rules:
   require_final_review: true
 ```
 
-More examples:
+Save reusable project templates in:
+
+```txt
+.agentflow/templates/<name>.yaml
+```
+
+Then run them by name:
+
+```txt
+/agentflow run <name> "<task>"
+```
+
+More workflow examples:
 
 ```txt
 claude/skills/agentflow/examples/workflow-templates/
-claude/skills/agentflow/examples/role-templates/
 ```
 
 Role permissions such as `can_edit` and `can_run_commands` are workflow constraints in the prompt. Claude Code's normal tool confirmation settings still apply.

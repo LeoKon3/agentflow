@@ -4,6 +4,8 @@ All notable changes to AgentFlow will be documented in this file.
 
 ## Unreleased
 
+## 0.0.3 - 2026-05-25
+
 ### Added
 
 - Documented `/agentflow role <role> "<task>"` in the English and Chinese READMEs.
@@ -22,7 +24,7 @@ All notable changes to AgentFlow will be documented in this file.
 - Condensed README custom role prompt guidance into a compact checklist.
 - Clarified that single-role mode reports only one role's decision and does not complete a workflow or bypass test/review gates.
 - Tightened built-in role prompt permission wording while preserving each role's decision contract and output structure.
-- Consolidated Security Reviewer scope wording while keeping coverage for authentication, authorization, sessions, tokens, secrets, injection, SSRF, webhooks, payments, permissions, file upload/download, admin features, and multi-tenant access.
+- Consolidated Security Reviewer scope wording while keeping coverage for authentication, authorization, sessions, tokens, secrets, injection, SSRF, webhooks, payments, permissions, file upload/download, admin features, and multi-tenant data access.
 
 ## 0.0.2 - 2026-05-25
 

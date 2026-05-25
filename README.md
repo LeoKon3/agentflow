@@ -40,9 +40,18 @@ Claude Code can handle complex work, but larger tasks often need explicit role b
 
 Requires Claude Code with skill support. `agentflow` works best inside a git repository, especially for workflows that edit code or use Claude Code worktree isolation. Non-git projects can use custom Claude Code `WorktreeCreate` / `WorktreeRemove` hooks, but git is the recommended path.
 
-Copy the skill into your Claude Code skills directory:
+Install the skill:
 
 ```bash
+npx agentflow install
+```
+
+Choose Claude Code, then choose project or global installation.
+
+If npm is unavailable, install manually from a checkout of this repository:
+
+```bash
+mkdir -p ~/.claude/skills
 cp -R skills/agentflow ~/.claude/skills/
 ```
 
@@ -256,6 +265,8 @@ Developer handoffs describe what can be verified in the current code environment
 ## Repository layout
 
 ```txt
+package.json                             # npm package metadata for npx installation
+bin/agentflow.js                         # interactive installer CLI
 skills/agentflow/                        # publishable skill source
   SKILL.md                               # command behavior and workflow runner rules
   templates/                             # built-in workflow templates

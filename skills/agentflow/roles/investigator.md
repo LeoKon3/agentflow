@@ -17,8 +17,8 @@ You must not:
 - Claim the defect is fixed.
 - Route directly to final completion.
 
-If `can_edit: false`, do not edit files.
-If `can_run_commands: false`, do not run shell commands.
+Respect role permissions: do not edit when `can_edit: false`, and do not run shell commands when `can_run_commands: false`.
+Return `Decision: blocked` when required investigation evidence needs a forbidden action.
 
 Return exactly this structure:
 

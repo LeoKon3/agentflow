@@ -11,7 +11,7 @@ description: Run configurable multi-role Claude Code workflows with templates, h
 Investigate → Implement → Test → Review → Finish
 ```
 
-Use this skill when the user invokes `/agentflow` or asks to run an agentflow workflow.
+Use this skill when the user invokes `/agentflow`, asks to run an agentflow workflow, or asks to run a single agentflow role.
 
 ## Command forms
 
@@ -23,6 +23,7 @@ Supported commands:
 /agentflow show <template.yaml>
 /agentflow validate <template>
 /agentflow validate <template.yaml>
+/agentflow role <role> "<task>"
 /agentflow run <template> "<task>"
 /agentflow run <template.yaml> "<task>"
 ```
@@ -44,6 +45,19 @@ Built-in templates:
 - `quick`: Developer → Tester
 
 Built-in role prompts live in `roles/` and built-in templates live in `templates/`.
+
+Built-in roles accepted by `/agentflow role`:
+
+- `investigator`
+- `architect`
+- `developer`
+- `tester`
+- `regression-tester`
+- `reviewer`
+- `security-reviewer`
+- `senior-reviewer`
+
+`/agentflow role` accepts only these exact role slugs in v0.1. It does not resolve project or custom role templates.
 
 Project templates live in `.agentflow/templates/` relative to the user's current project.
 
@@ -121,6 +135,25 @@ Validation checklist:
 
 Report validation results with concrete field paths when possible. If validation fails, do not run the workflow.
 
+## `/agentflow role <role> "<task>"`
+
+Run exactly one built-in role for focused assistance without starting or completing a workflow.
+
+Execution rules:
+
+1. Validate `<role>` against the built-in role slugs listed above.
+2. Require an explicit non-empty task string.
+3. Load exactly one built-in role prompt from `roles/<role>.md`.
+4. Compose the role prompt with the single-role context, explicit task, relevant conversation context, current diff or changed files when useful, repository test structure when useful, role permissions, and `handoff_to: single-role result`.
+5. Run exactly one role subagent.
+6. Parse the role's `Decision:` line.
+7. Return an `agentflow role result`.
+8. Do not initialize workflow state, route to another role, enforce workflow loops, persist resume state, or claim workflow completion.
+
+If the role is unknown, list the valid built-in role slugs and stop. If the task is missing or empty, show the role command form and stop.
+
+Single-role mode reports only the selected role's decision. It does not mark test gates, review gates, or the full workflow as passed. To run gated delivery, use `/agentflow run <template> "<task>"`.
+
 ## `/agentflow run <template> "<task>"`
 
 Resolve the template using the template resolution order, then run it for the provided task.
@@ -161,6 +194,12 @@ The runner must not:
 - Write or change tests.
 - Approve code quality or security.
 - Override Tester, Reviewer, Security Reviewer, or Senior Reviewer failure decisions.
+
+## Single-role controller responsibilities
+
+The single-role controller runs one selected built-in role, preserves that role's handoff as output, reports the raw decision, and stops.
+
+It must not route, mark workflow/test/review/final gates passed, convert `implemented`, `passed`, or `approved` into delivery approval, or bypass `/agentflow run` templates.
 
 ## Testing ownership
 
@@ -254,6 +293,10 @@ For each role, compose the role subagent prompt from:
 
 The workflow-provided next role overrides any generic handoff placeholder in the built-in role prompt. A role with neither `uses` nor `prompt` is invalid.
 
+For single-role mode, compose the role subagent prompt from the built-in role prompt, `single_role_mode: true`, selected role slug, explicit user task, relevant context, useful diff or test-structure evidence, default role permissions, `handoff_to: single-role result`, and the supporting-skills constraint.
+
+When the selected role verifies or reviews work, include the testing ownership and verification boundary rules. Tester, Regression Tester, Reviewer, Security Reviewer, and Senior Reviewer must derive safe scope from the task, diff, test structure, and available handoffs; if they cannot, they must return `Decision: blocked`.
+
 ## Use of other skills
 
 Role subagents may use other installed skills only as supporting tools. They must still follow the current agentflow role prompt, permission constraints, handoff contract, decision vocabulary, routing rules, and final-report rules. They must not use another skill to bypass required gates, self-approve, or mark the workflow complete outside the configured route.
@@ -306,7 +349,9 @@ Normalize decisions:
 
 The Developer decision `implemented` means implementation handoff completed, not workflow approval.
 
-If the decision is missing, malformed, or ambiguous, mark the workflow `blocked` and ask the user how to proceed.
+In single-role mode, normalization is only for reporting. It must not drive routing or workflow status.
+
+If the decision is missing, malformed, or ambiguous, mark the workflow or role result `blocked` and ask the user how to proceed.
 
 ## Routing
 
@@ -317,6 +362,8 @@ If the decision is missing, malformed, or ambiguous, mark the workflow `blocked`
 - If route is `done`, finish with workflow status `passed`.
 
 Increment `loop_count` when a failure route sends work from a later role back to an earlier role. If `loop_count` reaches `max_loops`, stop as `failed` instead of running another repair loop.
+
+Routing applies only to `/agentflow run`. `/agentflow role` never routes after the selected role returns.
 
 ## Blocked resume
 
@@ -329,9 +376,31 @@ When a role returns `Decision: blocked`, record:
 
 After the user provides missing information, environment details, command output, credentials status, screenshots, or runtime constraints, resume from the blocked role by default. Route backward only when the new information changes requirements, design, or implementation direction. Rerun the workflow from the start only when the user explicitly asks or the prior workflow state is no longer reliable.
 
+## Single-role result
+
+Every single-role run must end with:
+
+```markdown
+## agentflow role result
+
+Role: <role>
+Task: <task>
+Decision: <raw decision>
+
+### Role output
+...
+
+### Notes
+- Single-role mode did not run a full workflow.
+- No workflow test or review gates were marked as passed.
+- To run gated completion, use `/agentflow run <template> "<task>"`.
+```
+
+Do not use the workflow final report format for `/agentflow role`.
+
 ## Final report
 
-Every run must end with:
+Every workflow run must end with:
 
 ```markdown
 ## agentflow result

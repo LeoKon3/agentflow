@@ -43,7 +43,7 @@ Requires Claude Code with skill support. `agentflow` works best inside a git rep
 Install the skill:
 
 ```bash
-npx agentflow install
+npx @leokon3/agentflow@latest install
 ```
 
 Choose Claude Code, then choose project or global installation.
@@ -61,6 +61,7 @@ Then start Claude Code in any project:
 /agentflow list
 /agentflow show bugfix
 /agentflow run bugfix "fix login redirect bug"
+/agentflow role reviewer "review the current diff"
 ```
 
 Run a custom workflow YAML file:
@@ -93,8 +94,13 @@ Or place a project template at `.agentflow/templates/strict-bugfix.yaml` and run
 | `/agentflow list`                         | Show built-in and project workflows. |
 | `/agentflow show <template>`              | Inspect a workflow.                  |
 | `/agentflow validate <template>`          | Validate a workflow template.        |
+| `/agentflow role <role> "<task>"`         | Run one built-in role only.          |
 | `/agentflow run <template> "<task>"`      | Run a workflow by name.              |
 | `/agentflow run <template.yaml> "<task>"` | Run a workflow file by path.         |
+
+Single-role mode is for focused investigation, design, implementation, testing, or review. It reports only that role's decision; it does not mark a workflow passed or bypass test/review gates.
+
+Valid built-in role slugs: `investigator`, `architect`, `developer`, `tester`, `regression-tester`, `reviewer`, `security-reviewer`, `senior-reviewer`. Custom/project role templates are not resolved by `/agentflow role` in v0.1.
 
 Template resolution order:
 
@@ -194,56 +200,16 @@ docs-reviewer:
   fail_to: docs-writer
 ```
 
-The YAML above configures the role inside a workflow. A reusable role template itself is a Markdown prompt contract. A shortened example looks like this:
+The YAML above configures a role inside a workflow. A reusable role template is a Markdown prompt contract. For a fully custom role without `uses`, include:
 
-````markdown
-# Docs Reviewer
+- role responsibility
+- allowed actions and limits
+- decision vocabulary
+- required output structure
+- pass/fail/block conditions
+- handoff destination
 
-You are a documentation reviewer responsible for checking clarity, accuracy, and usefulness.
-
-You must:
-
-- Review changed documentation, workflow context, handoffs, and verification evidence.
-- Check examples, command names, file paths, links, terminology, and repo consistency.
-- Request changes when docs are misleading, incomplete, unsupported, or too vague.
-
-You must not:
-
-- Edit files unless the workflow role explicitly allows editing.
-- Approve documentation that contradicts current code or project structure.
-
-Return a structured result such as:
-
-```markdown
-## Docs Review Result
-
-Decision: approved | changes_requested | blocked
-
-### Documentation reviewed
-
-...
-
-### Issues
-
-...
-
-### Required changes
-
-...
-
-### Approval notes
-
-...
-
-### Handoff to
-
-<workflow-provided next role>
-```
-
-Use `Decision: approved` only when the docs are accurate, clear, and scoped.
-````
-
-For a fully custom role prompt without `uses`, write the role like a small contract with responsibility, allowed actions, decision vocabulary, required output structure, pass/fail/block conditions, and handoff destination.
+Keep role prompts small and explicit: the workflow should make it clear what the role may do, how it decides, and where it hands off next.
 
 Role prompt examples live in:
 

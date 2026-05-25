@@ -43,7 +43,7 @@ Requires Claude Code with skill support. `agentflow` works best inside a git rep
 Copy the skill into your Claude Code skills directory:
 
 ```bash
-cp -R claude/skills/agentflow ~/.claude/skills/
+cp -R skills/agentflow ~/.claude/skills/
 ```
 
 Then start Claude Code in any project:
@@ -57,8 +57,8 @@ Then start Claude Code in any project:
 Run a custom workflow YAML file:
 
 ```txt
-/agentflow validate ./claude/skills/agentflow/examples/workflow-templates/strict-bugfix.yaml
-/agentflow run ./claude/skills/agentflow/examples/workflow-templates/strict-bugfix.yaml "fix login redirect bug"
+/agentflow validate ./skills/agentflow/examples/workflow-templates/strict-bugfix.yaml
+/agentflow run ./skills/agentflow/examples/workflow-templates/strict-bugfix.yaml "fix login redirect bug"
 ```
 
 Or place a project template at `.agentflow/templates/strict-bugfix.yaml` and run it by name:
@@ -69,23 +69,23 @@ Or place a project template at `.agentflow/templates/strict-bugfix.yaml` and run
 
 ## Built-in workflows
 
-| Template | Flow | Use when |
-| --- | --- | --- |
-| `bugfix` | Investigator → Developer → Tester → Reviewer | Diagnose, fix, verify, and review a defect. |
-| `feature` | Architect → Developer → Tester → Reviewer | Design, build, verify, and review new behavior. |
-| `refactor` | Architect → Developer → Regression Tester → Reviewer | Change structure while proving behavior stays the same. |
-| `security` | Developer → Security Reviewer → Tester → Senior Reviewer | Change security-sensitive code with extra review. |
-| `quick` | Developer → Tester | Make a small implementation with focused verification. |
+| Template   | Flow                                                     | Use when                                                |
+| ---------- | -------------------------------------------------------- | ------------------------------------------------------- |
+| `bugfix`   | Investigator → Developer → Tester → Reviewer             | Diagnose, fix, verify, and review a defect.             |
+| `feature`  | Architect → Developer → Tester → Reviewer                | Design, build, verify, and review new behavior.         |
+| `refactor` | Architect → Developer → Regression Tester → Reviewer     | Change structure while proving behavior stays the same. |
+| `security` | Developer → Security Reviewer → Tester → Senior Reviewer | Change security-sensitive code with extra review.       |
+| `quick`    | Developer → Tester                                       | Make a small implementation with focused verification.  |
 
 ## Commands
 
-| Command | Purpose |
-| --- | --- |
-| `/agentflow list` | Show built-in and project workflows. |
-| `/agentflow show <template>` | Inspect a workflow. |
-| `/agentflow validate <template>` | Validate a workflow template. |
-| `/agentflow run <template> "<task>"` | Run a workflow by name. |
-| `/agentflow run <template.yaml> "<task>"` | Run a workflow file by path. |
+| Command                                   | Purpose                              |
+| ----------------------------------------- | ------------------------------------ |
+| `/agentflow list`                         | Show built-in and project workflows. |
+| `/agentflow show <template>`              | Inspect a workflow.                  |
+| `/agentflow validate <template>`          | Validate a workflow template.        |
+| `/agentflow run <template> "<task>"`      | Run a workflow by name.              |
+| `/agentflow run <template.yaml> "<task>"` | Run a workflow file by path.         |
 
 Template resolution order:
 
@@ -101,11 +101,11 @@ Project templates take precedence over built-in templates with the same name.
 
 Each role returns a structured decision used for routing.
 
-| Role type | Decisions |
-| --- | --- |
-| Developer | `implemented`, `blocked` |
-| Tester / Regression Tester | `passed`, `failed`, `blocked` |
-| Reviewer roles | `approved`, `changes_requested`, `blocked` |
+| Role type                  | Decisions                                  |
+| -------------------------- | ------------------------------------------ |
+| Developer                  | `implemented`, `blocked`                   |
+| Tester / Regression Tester | `passed`, `failed`, `blocked`              |
+| Reviewer roles             | `approved`, `changes_requested`, `blocked` |
 
 `failed` and `changes_requested` route to the configured `fail_to` role.
 
@@ -163,7 +163,7 @@ Then run them by name:
 More workflow examples:
 
 ```txt
-claude/skills/agentflow/examples/workflow-templates/
+skills/agentflow/examples/workflow-templates/
 ```
 
 Role permissions such as `can_edit` and `can_run_commands` are workflow constraints in the prompt. Claude Code's normal tool confirmation settings still apply.
@@ -193,11 +193,13 @@ The YAML above configures the role inside a workflow. A reusable role template i
 You are a documentation reviewer responsible for checking clarity, accuracy, and usefulness.
 
 You must:
+
 - Review changed documentation, workflow context, handoffs, and verification evidence.
 - Check examples, command names, file paths, links, terminology, and repo consistency.
 - Request changes when docs are misleading, incomplete, unsupported, or too vague.
 
 You must not:
+
 - Edit files unless the workflow role explicitly allows editing.
 - Approve documentation that contradicts current code or project structure.
 
@@ -209,18 +211,23 @@ Return a structured result such as:
 Decision: approved | changes_requested | blocked
 
 ### Documentation reviewed
+
 ...
 
 ### Issues
+
 ...
 
 ### Required changes
+
 ...
 
 ### Approval notes
+
 ...
 
 ### Handoff to
+
 <workflow-provided next role>
 ```
 
@@ -232,7 +239,7 @@ For a fully custom role prompt without `uses`, write the role like a small contr
 Role prompt examples live in:
 
 ```txt
-claude/skills/agentflow/examples/role-templates/
+skills/agentflow/examples/role-templates/
 ```
 
 Included examples:
@@ -249,11 +256,9 @@ Developer handoffs describe what can be verified in the current code environment
 ## Repository layout
 
 ```txt
-claude/skills/agentflow/                 # publishable Claude Code skill source
+skills/agentflow/                        # publishable skill source
   SKILL.md                               # command behavior and workflow runner rules
   templates/                             # built-in workflow templates
   roles/                                 # built-in role prompts
   examples/                              # copyable workflow and role examples
 ```
-
-The local `.claude/` directory is for machine-specific Claude Code settings and local testing. It is not the product source.

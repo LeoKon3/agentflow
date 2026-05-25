@@ -111,8 +111,8 @@
       .mainBase { stroke: #BFD7FF; stroke-width: 7; stroke-linecap: round; opacity: .3; }
       .mainConn { stroke: url(#mainLine); stroke-width: 4.2; stroke-linecap: round; marker-end: url(#arrowMain); }
       .mainPulse { stroke: #FFFFFF; stroke-width: 1.6; stroke-linecap: round; stroke-dasharray: 10 18; opacity: .46; animation: forward 3.4s linear infinite; }
-      .blockedConn { stroke: url(#blockedLine); stroke-width: 1.2; stroke-linecap: round; stroke-dasharray: 4 8; opacity: .32; marker-end: url(#arrowTeal); }
-      .repairConn { stroke: url(#repairLine); stroke-width: 1.45; stroke-linecap: round; stroke-dasharray: 5 9; opacity: .48; marker-end: url(#arrowAmber); }
+      .blockedConn { stroke: url(#blockedLine); stroke-width: 1.2; stroke-linecap: round; stroke-dasharray: 4 8; opacity: .32; marker-end: url(#arrowTeal); animation: blockedFlow 3.2s linear infinite; }
+      .repairConn { stroke: url(#repairLine); stroke-width: 1.45; stroke-linecap: round; stroke-dasharray: 5 9; opacity: .48; marker-end: url(#arrowAmber); animation: repairFlow 3s linear infinite; }
       .repairPanel { fill: var(--orange-bg); stroke: var(--orange-border); stroke-width: 1.15; }
       .repairTitle { fill: var(--text); font-size: 14px; font-weight: 780; }
       .repairRoute { fill: var(--orange-text); font-size: 12.5px; font-weight: 700; }
@@ -126,6 +126,8 @@
         .darkGlow { display: block; }
       }
       @keyframes forward { to { stroke-dashoffset: -56; } }
+      @keyframes blockedFlow { to { stroke-dashoffset: -36; } }
+      @keyframes repairFlow { to { stroke-dashoffset: -42; } }
     </style>
   </defs>
 

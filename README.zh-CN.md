@@ -278,3 +278,11 @@ skills/agentflow/                        # 可发布的 skill 源码
   roles/                                 # 内置角色 prompts
   examples/                              # 可复制的 workflow 和 role 示例
 ```
+
+## 致谢
+
+感谢 Linux.do 社区的反馈、讨论和启发。
+
+<p align="center">
+  <a href="https://linux.do/"><img alt="Linux.do community" src="https://img.shields.io/badge/Linux.do-community-0ea5e9?style=for-the-badge"></a>
+</p>

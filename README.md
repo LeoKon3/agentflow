@@ -278,3 +278,11 @@ skills/agentflow/                        # publishable skill source
   roles/                                 # built-in role prompts
   examples/                              # copyable workflow and role examples
 ```
+
+## Acknowledgements
+
+Thanks to the Linux.do community for feedback, discussion, and inspiration.
+
+<p align="center">
+  <a href="https://linux.do/"><img alt="Linux.do community" src="https://img.shields.io/badge/Linux.do-community-0ea5e9?style=for-the-badge"></a>
+</p>

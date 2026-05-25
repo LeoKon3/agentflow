@@ -59,10 +59,14 @@ Then start Claude Code in any project:
 
 ```txt
 /agentflow list
-/agentflow show bugfix
-/agentflow run bugfix "fix login redirect bug"
+/agentflow show feature
+/agentflow run feature "add a settings page with save validation"
+/agentflow run bugfix "fix login redirect after OAuth callback"
+/agentflow run refactor "split the billing service without changing behavior"
 /agentflow role reviewer "review the current diff"
 ```
+
+Use the task string to describe the outcome you want. AgentFlow passes that task through each role, so specific requests work best.
 
 Run a custom workflow YAML file:
 
@@ -128,7 +132,7 @@ Each role returns a structured decision used for routing.
 
 ## Custom workflows
 
-Custom workflows are YAML files with roles, routes, a start role, and workflow rules.
+Custom workflows are YAML files with roles, routes, a start role, and workflow rules. Start by copying one of the examples or create `.agentflow/templates/<name>.yaml` in your project.
 
 ```yaml
 name: strict-bugfix
@@ -163,16 +167,29 @@ rules:
   require_final_review: true
 ```
 
+Key fields:
+
+- `uses`: reuse a built-in role prompt such as `builtin/developer`, `builtin/tester`, or `builtin/reviewer`.
+- `prompt`: add role-specific instructions on top of the built-in prompt.
+- `can_edit`: whether the role is allowed by the workflow contract to edit files.
+- `can_run_commands`: whether the role is allowed by the workflow contract to run shell commands.
+- `pass_to`: next role when the role succeeds, or `done` to finish.
+- `fail_to`: next role when the role fails or requests changes.
+- `flow.start`: first role to run.
+- `rules.max_loops`: maximum repair loops before stopping.
+- `rules.require_tests` / `rules.require_final_review`: required gate checks for successful completion.
+
 Save reusable project templates in:
 
 ```txt
 .agentflow/templates/<name>.yaml
 ```
 
-Then run them by name:
+Validate and run them by name:
 
 ```txt
-/agentflow run <name> "<task>"
+/agentflow validate <name>
+/agentflow run <name> "add export to CSV for the reports table"
 ```
 
 More workflow examples:
@@ -210,6 +227,28 @@ The YAML above configures a role inside a workflow. A reusable role template is 
 - handoff destination
 
 Keep role prompts small and explicit: the workflow should make it clear what the role may do, how it decides, and where it hands off next.
+
+A minimal custom role prompt can look like this:
+
+```markdown
+# Docs Reviewer
+
+You are responsible for reviewing documentation changes for clarity and accuracy.
+
+You must:
+- Check changed docs, examples, command names, links, and terminology.
+- Request changes when docs are misleading, incomplete, or unsupported.
+
+You must not:
+- Edit files unless the workflow role allows editing.
+- Approve docs that contradict the current code or workflow.
+
+Return:
+- `Decision: approved | changes_requested | blocked`
+- issues found
+- required changes
+- handoff target
+```
 
 Role prompt examples live in:
 

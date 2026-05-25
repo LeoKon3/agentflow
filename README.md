@@ -29,7 +29,7 @@ Use it when you want:
 - custom YAML workflows and custom role prompts.
 
 <p align="center">
-  <img src="assets/agentflow-workflow.svg" alt="Animated agentflow workflow diagram" width="100%" />
+  <img src="assets/agentflow-workflow.svg" alt="Flowing agentflow workflow visual" width="100%" />
 </p>
 
 ## Repository layout

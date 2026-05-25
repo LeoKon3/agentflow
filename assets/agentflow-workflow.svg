@@ -1,123 +1,288 @@
-<svg width="1200" height="420" viewBox="0 0 1200 420" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
-  <title id="title">agentflow workflow animation</title>
-  <desc id="desc">An animated workflow diagram showing a task moving through Developer, Tester, Reviewer, and Done, with a repair loop from Tester back to Developer.</desc>
+<svg width="1270" height="760" viewBox="0 0 1270 760" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">AgentFlow — Role-Based Coding Workflow Runner</title>
+  <desc id="desc">AgentFlow workflow state machine showing handoff, test gate, review gate, failed repair routing, blocked recovery, optional roles, and final report output for Claude Code sessions.</desc>
   <defs>
-    <linearGradient id="node" x1="0" y1="0" x2="1" y2="1">
-      <stop stop-color="#EFF6FF"/>
-      <stop offset="1" stop-color="#ECFEFF"/>
+    <linearGradient id="bgGlowLight" x1="196" y1="102" x2="1074" y2="642" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#EFF6FF" stop-opacity="0.46"/>
+      <stop offset="0.5" stop-color="#ECFEFF" stop-opacity="0.26"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0.46"/>
     </linearGradient>
-    <linearGradient id="accent" x1="110" y1="130" x2="1090" y2="130" gradientUnits="userSpaceOnUse">
+    <linearGradient id="bgGlowDark" x1="196" y1="102" x2="1074" y2="642" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#10213D" stop-opacity="0.46"/>
+      <stop offset="0.5" stop-color="#0E2B36" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#0B1220" stop-opacity="0.46"/>
+    </linearGradient>
+    <linearGradient id="mainLine" x1="226" y1="318" x2="1044" y2="318" gradientUnits="userSpaceOnUse">
       <stop stop-color="#2563EB"/>
-      <stop offset="0.5" stop-color="#0891B2"/>
-      <stop offset="1" stop-color="#0F766E"/>
+      <stop offset="0.54" stop-color="#1D4ED8"/>
+      <stop offset="1" stop-color="#2563EB"/>
     </linearGradient>
-    <filter id="softShadow" x="-20%" y="-40%" width="140%" height="180%" color-interpolation-filters="sRGB">
-      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#0F172A" flood-opacity="0.16"/>
+    <linearGradient id="blockedLine" x1="388" y1="204" x2="869" y2="266" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#78C8C1"/>
+      <stop offset="1" stop-color="#5BAEA6"/>
+    </linearGradient>
+    <linearGradient id="repairLine" x1="388" y1="448" x2="869" y2="370" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#B9823F"/>
+      <stop offset="1" stop-color="#A86F36"/>
+    </linearGradient>
+    <filter id="cardShadow" x="-18%" y="-38%" width="136%" height="176%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="7" stdDeviation="8" flood-color="#0F172A" flood-opacity="0.045"/>
     </filter>
-    <filter id="glow" x="-80%" y="-80%" width="260%" height="260%" color-interpolation-filters="sRGB">
-      <feGaussianBlur stdDeviation="7" result="blur"/>
-      <feColorMatrix in="blur" type="matrix" values="0 0 0 0 0.14 0 0 0 0 0.54 0 0 0 0 0.72 0 0 0 0.7 0"/>
-      <feBlend in2="SourceGraphic" mode="screen"/>
+    <filter id="panelShadow" x="-12%" y="-28%" width="124%" height="156%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="5" stdDeviation="7" flood-color="#0F172A" flood-opacity="0.035"/>
     </filter>
-    <path id="mainPath" d="M116 142 C190 96 246 96 320 142 S450 188 524 142 S654 96 728 142 S858 188 932 142 S1022 100 1084 142"/>
-    <path id="repairPath" d="M710 244 C620 340 446 340 354 244"/>
+    <marker id="arrowMain" viewBox="0 0 10 10" refX="8.7" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M1 1L9 5L1 9Z" fill="#2563EB"/>
+    </marker>
+    <marker id="arrowTeal" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+      <path d="M1 1L9 5L1 9Z" fill="#66B7AF"/>
+    </marker>
+    <marker id="arrowAmber" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse">
+      <path d="M1 1L9 5L1 9Z" fill="#A86F36"/>
+    </marker>
+    <path id="mainMotion" d="M226 318H315M461 318H550M696 318H785M953 318H1044"/>
     <style>
-      .rail {
-        stroke-dasharray: 10 18;
-        animation: flow 1.9s linear infinite;
+      svg {
+        color-scheme: light dark;
+        --bg: #ffffff;
+        --text: #0f172a;
+        --muted: #64748b;
+        --faint: #a3afbf;
+        --line-soft: #dbe5f2;
+        --card: #ffffff;
+        --card-border: #d4dfec;
+        --blue: #2563eb;
+        --cyan: #3b9fa8;
+        --teal: #2f9a90;
+        --teal-bg: #f8fffd;
+        --teal-border: #c8eee8;
+        --green: #16a34a;
+        --orange-bg: #fffaf2;
+        --orange-border: #ecd4b2;
+        --orange-text: #8a5a20;
+        --icon-bg: #f8fbff;
+        --icon-border: #c7d6eb;
       }
-      .rail-slow {
-        stroke-dasharray: 6 16;
-        animation: flowBack 2.4s linear infinite;
+      @media (prefers-color-scheme: dark) {
+        svg {
+          --bg: #0b1220;
+          --text: #e5edf7;
+          --muted: #9aa9bc;
+          --faint: #6d7b91;
+          --line-soft: #22314a;
+          --card: #101827;
+          --card-border: #2b394f;
+          --blue: #60a5fa;
+          --cyan: #6bc8d0;
+          --teal: #73d0c6;
+          --teal-bg: #0d2428;
+          --teal-border: #285c5a;
+          --green: #4ade80;
+          --orange-bg: #2a1d0e;
+          --orange-border: #6d4b21;
+          --orange-text: #f0c98e;
+          --icon-bg: #111f33;
+          --icon-border: #2e4568;
+        }
       }
-      .node {
-        animation: breathe 3.8s ease-in-out infinite;
-        transform-box: fill-box;
-        transform-origin: center;
+      .font { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
+      .title { fill: var(--text); font-size: 38px; font-weight: 760; letter-spacing: -0.025em; }
+      .subtitle { fill: var(--muted); font-size: 16px; font-weight: 480; }
+      .section { fill: var(--muted); font-size: 12px; font-weight: 760; letter-spacing: .12em; }
+      .card { fill: var(--card); stroke: var(--card-border); stroke-width: 1.2; }
+      .nodeCard { fill: var(--card); stroke: var(--card-border); stroke-width: 1.2; }
+      .nodeTitle { fill: var(--text); font-size: 16px; font-weight: 760; }
+      .nodeSub { fill: var(--muted); font-size: 12px; font-weight: 520; }
+      .gateLabel { fill: var(--text); font-size: 11px; font-weight: 700; }
+      .bannerTitle { fill: var(--text); font-size: 15px; font-weight: 780; }
+      .bannerRoute { fill: var(--teal); font-size: 13px; font-weight: 720; }
+      .bannerSub { fill: var(--muted); font-size: 11.5px; font-weight: 520; }
+      .capTitle { fill: var(--text); font-size: 11.6px; font-weight: 760; }
+      .capSub { fill: var(--muted); font-size: 10.6px; font-weight: 520; }
+      .reportTitle { fill: var(--text); font-size: 14px; font-weight: 760; }
+      .reportItem { fill: var(--muted); font-size: 12.5px; font-weight: 540; }
+      .footer { fill: var(--faint); font-size: 13px; font-weight: 520; }
+      .iconCircle { fill: var(--icon-bg); stroke: var(--icon-border); stroke-width: 1; }
+      .iconStroke { stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+      .blueIcon { color: var(--blue); }
+      .cyanIcon { color: var(--cyan); }
+      .tealIcon { color: var(--teal); }
+      .greenIcon { color: var(--green); }
+      .mainBase { stroke: #BFD7FF; stroke-width: 7; stroke-linecap: round; opacity: .3; }
+      .mainConn { stroke: url(#mainLine); stroke-width: 4.2; stroke-linecap: round; marker-end: url(#arrowMain); }
+      .mainPulse { stroke: #FFFFFF; stroke-width: 1.6; stroke-linecap: round; stroke-dasharray: 10 18; opacity: .46; animation: forward 3.4s linear infinite; }
+      .blockedConn { stroke: url(#blockedLine); stroke-width: 1.2; stroke-linecap: round; stroke-dasharray: 4 8; opacity: .32; marker-end: url(#arrowTeal); }
+      .repairConn { stroke: url(#repairLine); stroke-width: 1.45; stroke-linecap: round; stroke-dasharray: 5 9; opacity: .48; marker-end: url(#arrowAmber); }
+      .repairPanel { fill: var(--orange-bg); stroke: var(--orange-border); stroke-width: 1.15; }
+      .repairTitle { fill: var(--text); font-size: 14px; font-weight: 780; }
+      .repairRoute { fill: var(--orange-text); font-size: 12.5px; font-weight: 700; }
+      .blockedBanner { fill: var(--teal-bg); stroke: var(--teal-border); stroke-width: 1.15; }
+      .lightGlow { display: block; }
+      .darkGlow { display: none; }
+      @media (prefers-color-scheme: dark) {
+        .mainBase { stroke: #24466F; opacity: .34; }
+        .mainPulse { stroke: #DBEAFE; opacity: .3; }
+        .lightGlow { display: none; }
+        .darkGlow { display: block; }
       }
-      .node:nth-of-type(2) { animation-delay: .18s; }
-      .node:nth-of-type(3) { animation-delay: .36s; }
-      .node:nth-of-type(4) { animation-delay: .54s; }
-      .node:nth-of-type(5) { animation-delay: .72s; }
-      @keyframes flow {
-        to { stroke-dashoffset: -56; }
-      }
-      @keyframes flowBack {
-        to { stroke-dashoffset: 44; }
-      }
-      @keyframes breathe {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.025); }
-      }
+      @keyframes forward { to { stroke-dashoffset: -56; } }
     </style>
   </defs>
 
+  <rect width="1270" height="760" fill="var(--bg)"/>
+  <ellipse class="lightGlow" cx="635" cy="358" rx="490" ry="252" fill="url(#bgGlowLight)" opacity="0.34"/>
+  <ellipse class="darkGlow" cx="635" cy="358" rx="490" ry="252" fill="url(#bgGlowDark)" opacity="0.46"/>
   <g opacity="0.22">
-    <circle cx="120" cy="78" r="56" fill="#DBEAFE"/>
-    <circle cx="1052" cy="315" r="72" fill="#CCFBF1"/>
-    <circle cx="600" cy="348" r="120" fill="#E0F2FE"/>
+    <path d="M140 104H1130" stroke="var(--line-soft)" stroke-width="1" stroke-dasharray="1 18" stroke-linecap="round"/>
+    <path d="M140 526H1130" stroke="var(--line-soft)" stroke-width="1" stroke-dasharray="1 18" stroke-linecap="round"/>
   </g>
 
-  <use href="#mainPath" stroke="#C7D2FE" stroke-width="18" stroke-linecap="round" opacity="0.34"/>
-  <use href="#mainPath" class="rail" stroke="url(#accent)" stroke-width="4" stroke-linecap="round" opacity="0.86"/>
-  <use href="#repairPath" stroke="#BAE6FD" stroke-width="16" stroke-linecap="round" opacity="0.25"/>
-  <use href="#repairPath" class="rail-slow" stroke="#0284C7" stroke-width="3.5" stroke-linecap="round" opacity="0.62"/>
-
-  <g filter="url(#glow)">
-    <circle r="8" fill="#2563EB">
-      <animateMotion dur="3.4s" repeatCount="indefinite" rotate="auto">
-        <mpath href="#mainPath"/>
-      </animateMotion>
-    </circle>
-    <circle r="5" fill="#14B8A6">
-      <animateMotion dur="3.4s" begin="1.15s" repeatCount="indefinite" rotate="auto">
-        <mpath href="#mainPath"/>
-      </animateMotion>
-    </circle>
-    <circle r="6" fill="#0EA5E9">
-      <animateMotion dur="2.9s" begin=".4s" repeatCount="indefinite" rotate="auto">
-        <mpath href="#repairPath"/>
-      </animateMotion>
-    </circle>
+  <g class="font">
+    <text x="635" y="54" text-anchor="middle" class="title">AgentFlow — Role-Based Coding Workflow Runner</text>
+    <text x="635" y="84" text-anchor="middle" class="subtitle">Configurable handoffs, test gates, review gates, failure routing, and blocked-state recovery for Claude Code sessions.</text>
   </g>
 
-  <g font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" filter="url(#softShadow)">
-    <g class="node">
-      <rect x="54" y="100" width="124" height="84" rx="24" fill="url(#node)" stroke="#BFDBFE"/>
-      <text x="116" y="137" text-anchor="middle" fill="#0F172A" font-size="20" font-weight="800">Task</text>
-      <text x="116" y="162" text-anchor="middle" fill="#475569" font-size="13">user intent</text>
+  <g id="blocked-recovery" class="font" filter="url(#panelShadow)">
+    <rect x="315" y="116" width="640" height="88" rx="18" class="blockedBanner"/>
+    <circle cx="356" cy="160" r="18" class="iconCircle"/>
+    <g class="tealIcon">
+      <path d="M349 161C352 154 360 154 363 161" class="iconStroke"/>
+      <path d="M356 149V155M356 165V171M346 160H351M361 160H366" class="iconStroke"/>
+    </g>
+    <text x="386" y="146" class="bannerTitle">Blocked Recovery</text>
+    <text x="386" y="166" class="bannerRoute">blocked → report → user input → resume same role</text>
+    <text x="386" y="185" class="bannerSub">missing info · permission · environment · command output</text>
+  </g>
+
+  <g id="paths">
+    <path d="M226 318H315" class="mainBase"/>
+    <path d="M461 318H550" class="mainBase"/>
+    <path d="M696 318H785" class="mainBase"/>
+    <path d="M953 318H1044" class="mainBase"/>
+    <path d="M226 318H315" class="mainConn"/>
+    <path d="M461 318H550" class="mainConn"/>
+    <path d="M696 318H785" class="mainConn"/>
+    <path d="M953 318H1044" class="mainConn"/>
+    <use href="#mainMotion" class="mainPulse"/>
+
+    <path d="M388 266C392 238 472 217 548 204" class="blockedConn"/>
+    <path d="M623 266C623 242 623 224 623 204" class="blockedConn"/>
+    <path d="M869 266C865 238 786 217 722 204" class="blockedConn"/>
+
+    <path d="M623 370C623 392 604 404 592 416" class="repairConn"/>
+    <path d="M869 370C862 398 754 407 710 416" class="repairConn"/>
+    <path d="M390 447C326 447 337 386 388 370" class="repairConn"/>
+  </g>
+
+  <g id="main-nodes" class="font" filter="url(#cardShadow)">
+    <g transform="translate(80 266)">
+      <rect width="146" height="104" rx="22" class="nodeCard"/>
+      <circle cx="73" cy="28" r="14" class="iconCircle"/>
+      <g class="blueIcon">
+        <path d="M73 27C77 27 80 24 80 20C80 16 77 14 73 14C69 14 66 16 66 20C66 24 69 27 73 27Z" class="iconStroke"/>
+        <path d="M63 38C66 31 80 31 83 38" class="iconStroke"/>
+      </g>
+      <text x="73" y="63" text-anchor="middle" class="nodeTitle">User Task</text>
+      <text x="73" y="83" text-anchor="middle" class="nodeSub">request</text>
     </g>
 
-    <g class="node">
-      <rect x="270" y="100" width="166" height="84" rx="24" fill="url(#node)" stroke="#93C5FD"/>
-      <text x="353" y="137" text-anchor="middle" fill="#0F172A" font-size="20" font-weight="800">Developer</text>
-      <text x="353" y="162" text-anchor="middle" fill="#475569" font-size="13">implements</text>
+    <g transform="translate(315 266)">
+      <rect width="146" height="104" rx="22" class="nodeCard"/>
+      <circle cx="73" cy="28" r="14" class="iconCircle"/>
+      <g class="blueIcon">
+        <path d="M68 22L62 28L68 34" class="iconStroke"/>
+        <path d="M78 22L84 28L78 34" class="iconStroke"/>
+        <path d="M76 19L70 37" class="iconStroke"/>
+      </g>
+      <text x="73" y="63" text-anchor="middle" class="nodeTitle">Developer</text>
+      <text x="73" y="83" text-anchor="middle" class="nodeSub">implements</text>
     </g>
 
-    <g class="node">
-      <rect x="508" y="100" width="166" height="84" rx="24" fill="url(#node)" stroke="#67E8F9"/>
-      <text x="591" y="137" text-anchor="middle" fill="#0F172A" font-size="20" font-weight="800">Tester</text>
-      <text x="591" y="162" text-anchor="middle" fill="#475569" font-size="13">verifies</text>
+    <g transform="translate(550 266)">
+      <rect width="146" height="104" rx="22" class="nodeCard"/>
+      <circle cx="73" cy="28" r="14" class="iconCircle"/>
+      <g class="cyanIcon">
+        <path d="M63 21H83V35H63Z" class="iconStroke"/>
+        <path d="M67 28L70 31L78 23" class="iconStroke"/>
+        <path d="M68 40H78" class="iconStroke"/>
+      </g>
+      <text x="73" y="63" text-anchor="middle" class="nodeTitle">Tester</text>
+      <text x="73" y="83" text-anchor="middle" class="nodeSub">verifies</text>
     </g>
 
-    <g class="node">
-      <rect x="746" y="100" width="166" height="84" rx="24" fill="url(#node)" stroke="#5EEAD4"/>
-      <text x="829" y="137" text-anchor="middle" fill="#0F172A" font-size="20" font-weight="800">Reviewer</text>
-      <text x="829" y="162" text-anchor="middle" fill="#475569" font-size="13">approves</text>
+    <g transform="translate(785 266)">
+      <rect width="168" height="104" rx="22" class="nodeCard"/>
+      <circle cx="84" cy="28" r="14" class="iconCircle"/>
+      <g class="tealIcon">
+        <path d="M84 16L96 22V29C96 37 90 41 84 44C78 41 72 37 72 29V22Z" class="iconStroke"/>
+        <path d="M79 30L83 34L91 25" class="iconStroke"/>
+      </g>
+      <text x="84" y="63" text-anchor="middle" class="nodeTitle">Reviewer</text>
+      <text x="84" y="83" text-anchor="middle" class="nodeSub">approves</text>
     </g>
 
-    <g class="node">
-      <rect x="1022" y="100" width="124" height="84" rx="24" fill="url(#node)" stroke="#99F6E4"/>
-      <text x="1084" y="137" text-anchor="middle" fill="#0F172A" font-size="20" font-weight="800">Done</text>
-      <text x="1084" y="162" text-anchor="middle" fill="#475569" font-size="13">report</text>
+    <g transform="translate(1044 266)">
+      <rect width="146" height="104" rx="22" class="nodeCard"/>
+      <circle cx="73" cy="28" r="14" class="iconCircle"/>
+      <g class="greenIcon">
+        <path d="M65 16H76L82 22V39H65Z" class="iconStroke"/>
+        <path d="M76 16V23H82" class="iconStroke"/>
+        <path d="M69 30H78M69 35H75" class="iconStroke"/>
+      </g>
+      <text x="73" y="63" text-anchor="middle" class="nodeTitle">Done</text>
+      <text x="73" y="83" text-anchor="middle" class="nodeSub">final report</text>
     </g>
   </g>
 
-  <g font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif">
-    <rect x="466" y="276" width="178" height="36" rx="18" fill="#F0F9FF" stroke="#BAE6FD"/>
-    <text x="555" y="299" text-anchor="middle" fill="#0369A1" font-size="14" font-weight="700">failed → route back</text>
-
-    <rect x="724" y="230" width="180" height="36" rx="18" fill="#F0FDFA" stroke="#99F6E4"/>
-    <text x="814" y="253" text-anchor="middle" fill="#0F766E" font-size="14" font-weight="700">blocked → resume point</text>
+  <g class="font">
+    <text x="505" y="298" text-anchor="middle" class="gateLabel">test gate</text>
+    <text x="740" y="298" text-anchor="middle" class="gateLabel">review gate</text>
   </g>
+
+  <g id="repair-loop" class="font" filter="url(#panelShadow)">
+    <rect x="390" y="416" width="490" height="62" rx="18" class="repairPanel"/>
+    <text x="635" y="441" text-anchor="middle" class="repairTitle">Repair Loop</text>
+    <text x="635" y="462" text-anchor="middle" class="repairRoute">failed / changes_requested → fix → retest</text>
+  </g>
+
+  <g id="optional-roles" class="font">
+    <text x="94" y="560" class="section">OPTIONAL WORKFLOW ROLES</text>
+    <g filter="url(#panelShadow)">
+      <g transform="translate(94 586)">
+        <rect width="142" height="66" rx="15" class="card"/>
+        <text x="16" y="27" class="capTitle">Investigator</text>
+        <text x="16" y="47" class="capSub">root cause</text>
+      </g>
+      <g transform="translate(250 586)">
+        <rect width="142" height="66" rx="15" class="card"/>
+        <text x="16" y="27" class="capTitle">Architect</text>
+        <text x="16" y="47" class="capSub">minimal plan</text>
+      </g>
+      <g transform="translate(406 586)">
+        <rect width="142" height="66" rx="15" class="card"/>
+        <text x="16" y="27" class="capTitle">Regression Tester</text>
+        <text x="16" y="47" class="capSub">behavior unchanged</text>
+      </g>
+      <g transform="translate(562 586)">
+        <rect width="142" height="66" rx="15" class="card"/>
+        <text x="16" y="27" class="capTitle">Security Reviewer</text>
+        <text x="16" y="47" class="capSub">auth / permissions</text>
+      </g>
+      <g transform="translate(718 586)">
+        <rect width="142" height="66" rx="15" class="card"/>
+        <text x="16" y="27" class="capTitle">Senior Reviewer</text>
+        <text x="16" y="47" class="capSub">final high-risk approval</text>
+      </g>
+    </g>
+  </g>
+
+  <g id="final-report" class="font" filter="url(#panelShadow)">
+    <rect x="888" y="566" width="288" height="118" rx="18" class="card"/>
+    <text x="914" y="598" class="reportTitle">Final report includes</text>
+    <text x="914" y="625" class="reportItem">blocked role · blocker summary</text>
+    <text x="914" y="648" class="reportItem">missing requirement · user options</text>
+    <text x="914" y="671" class="reportItem">test evidence · approval notes</text>
+  </g>
+
+  <text x="635" y="742" text-anchor="middle" class="font footer">AgentFlow turns Claude Code sessions into role-based workflows with handoffs, gates, recovery loops, and evidence-based final reports.</text>
 </svg>

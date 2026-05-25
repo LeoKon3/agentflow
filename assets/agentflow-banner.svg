@@ -1,38 +1,167 @@
 <svg width="1200" height="360" viewBox="0 0 1200 360" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
   <title id="title">AGENTFLOW</title>
-  <desc id="desc">A gradient banner for the agentflow Claude Code workflow tool.</desc>
+  <desc id="desc">A dark technology banner for AgentFlow with a glowing workflow line and recovery loop.</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="360" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#111827"/>
-      <stop offset="0.48" stop-color="#312E81"/>
-      <stop offset="1" stop-color="#0F766E"/>
+      <stop stop-color="#050814"/>
+      <stop offset="0.48" stop-color="#10143A"/>
+      <stop offset="1" stop-color="#062C34"/>
     </linearGradient>
-    <linearGradient id="line" x1="170" y1="190" x2="1030" y2="190" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#A78BFA"/>
-      <stop offset="0.5" stop-color="#60A5FA"/>
-      <stop offset="1" stop-color="#5EEAD4"/>
+
+    <radialGradient id="violetGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(178 58) rotate(48) scale(190 120)">
+      <stop stop-color="#9F7AEA" stop-opacity="0.26"/>
+      <stop offset="1" stop-color="#9F7AEA" stop-opacity="0"/>
+    </radialGradient>
+
+    <radialGradient id="tealGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1010 285) rotate(-18) scale(245 135)">
+      <stop stop-color="#2DD4BF" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#2DD4BF" stop-opacity="0"/>
+    </radialGradient>
+
+    <linearGradient id="workflowLine" x1="235" y1="178" x2="965" y2="178" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#B69CFF"/>
+      <stop offset="0.34" stop-color="#6DA7FF"/>
+      <stop offset="0.68" stop-color="#4DD7F3"/>
+      <stop offset="1" stop-color="#69F0C6"/>
     </linearGradient>
-    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="sRGB">
-      <feGaussianBlur stdDeviation="18" result="blur"/>
-      <feColorMatrix in="blur" type="matrix" values="0 0 0 0 0.42 0 0 0 0 0.62 0 0 0 0 1 0 0 0 0.45 0"/>
+
+    <linearGradient id="loopLine" x1="930" y1="242" x2="235" y2="242" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#69F0C6"/>
+      <stop offset="0.38" stop-color="#4DD7F3"/>
+      <stop offset="0.72" stop-color="#6DA7FF"/>
+      <stop offset="1" stop-color="#B69CFF"/>
+    </linearGradient>
+
+    <filter id="lineGlow" x="170" y="120" width="860" height="175" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feColorMatrix in="blur" type="matrix" values="0 0 0 0 0.38 0 0 0 0 0.62 0 0 0 0 1 0 0 0 0.2 0"/>
       <feBlend in2="SourceGraphic" mode="screen"/>
     </filter>
+
+    <filter id="nodeGlow" x="-45%" y="-45%" width="190%" height="190%" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="2.8" result="blur"/>
+      <feBlend in="SourceGraphic" in2="blur" mode="screen"/>
+    </filter>
+
+    <pattern id="dotGrid" x="0" y="0" width="18" height="18" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="1" fill="#93C5FD" opacity="0.2"/>
+    </pattern>
+
+    <marker id="loopArrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M1 1L8 5L1 9" stroke="#B69CFF" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    </marker>
+
+    <style>
+      .titleText { font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 59px; font-weight: 800; letter-spacing: 13px; fill: #F8FBFF; }
+      .labelText { font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 11.5px; font-weight: 800; letter-spacing: 2px; }
+      .subtitleText { font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 20px; font-weight: 500; letter-spacing: 0.4px; fill: #C9DDF5; }
+      .icon { fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+      .ring { fill: rgba(5, 8, 20, 0.48); stroke-width: 1.8; }
+    </style>
   </defs>
+
   <rect width="1200" height="360" rx="32" fill="url(#bg)"/>
-  <g opacity="0.22">
-    <circle cx="165" cy="92" r="140" fill="#A78BFA"/>
-    <circle cx="1040" cy="278" r="180" fill="#2DD4BF"/>
+  <rect width="1200" height="360" rx="32" fill="url(#violetGlow)"/>
+  <rect width="1200" height="360" rx="32" fill="url(#tealGlow)"/>
+
+  <g opacity="0.16">
+    <rect x="82" y="204" width="146" height="74" fill="url(#dotGrid)"/>
   </g>
-  <g filter="url(#glow)">
-    <path d="M180 206H340L440 146L560 226L690 126L820 206H1020" stroke="url(#line)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
-    <circle cx="180" cy="206" r="18" fill="#C4B5FD"/>
-    <circle cx="340" cy="206" r="18" fill="#A78BFA"/>
-    <circle cx="440" cy="146" r="18" fill="#60A5FA"/>
-    <circle cx="560" cy="226" r="18" fill="#38BDF8"/>
-    <circle cx="690" cy="126" r="18" fill="#22D3EE"/>
-    <circle cx="820" cy="206" r="18" fill="#5EEAD4"/>
-    <circle cx="1020" cy="206" r="18" fill="#99F6E4"/>
+
+  <g opacity="0.2" stroke="#B69CFF" stroke-width="1.2">
+    <circle cx="166" cy="66" r="46"/>
+    <circle cx="166" cy="66" r="72" opacity="0.52"/>
+    <circle cx="166" cy="66" r="99" opacity="0.26"/>
   </g>
-  <text x="600" y="140" text-anchor="middle" fill="white" font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="72" font-weight="800" letter-spacing="10">AGENTFLOW</text>
-  <text x="600" y="270" text-anchor="middle" fill="#D1FAE5" font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="26" font-weight="500">Developer writes · Tester verifies · Reviewer approves</text>
+
+  <g opacity="0.18" stroke="#5EEAD4" stroke-width="1.4" stroke-linecap="round">
+    <path d="M995 254C1044 238 1092 244 1138 272"/>
+    <path d="M964 285C1031 263 1098 274 1162 318" opacity="0.62"/>
+    <path d="M1028 218C1078 211 1119 222 1156 248" opacity="0.44"/>
+  </g>
+
+  <g opacity="0.32">
+    <circle cx="368" cy="57" r="1.3" fill="#C4B5FD"/>
+    <circle cx="852" cy="72" r="1.4" fill="#7DD3FC"/>
+    <circle cx="1035" cy="116" r="1.2" fill="#5EEAD4"/>
+    <circle cx="716" cy="302" r="1.3" fill="#BAE6FD"/>
+    <circle cx="274" cy="298" r="1.1" fill="#A78BFA"/>
+    <circle cx="1104" cy="177" r="1.2" fill="#99F6E4"/>
+  </g>
+
+  <text x="600" y="94" text-anchor="middle" class="titleText">AGENTFLOW</text>
+
+  <g filter="url(#lineGlow)">
+    <path d="M260 178H940" stroke="url(#workflowLine)" stroke-width="2.1" stroke-linecap="round" opacity="0.76"/>
+    <path d="M940 205C930 258 870 279 774 279H304C255 279 230 261 240 226" stroke="url(#loopLine)" stroke-width="1.65" stroke-linecap="round" stroke-dasharray="5 9" opacity="0.62" marker-end="url(#loopArrow)"/>
+  </g>
+
+  <g filter="url(#nodeGlow)">
+    <g transform="translate(260 178)">
+      <circle r="24" class="ring" stroke="#B69CFF"/>
+      <circle r="16" fill="#100B2A" stroke="#B69CFF" stroke-opacity="0.45"/>
+      <g class="icon" stroke="#C4B5FD">
+        <circle cx="0" cy="-4.5" r="4"/>
+        <path d="M-7 8C-5.3 2.6 5.3 2.6 7 8"/>
+      </g>
+      <text x="0" y="52" text-anchor="middle" class="labelText" fill="#C4B5FD">REQUEST</text>
+    </g>
+
+    <g transform="translate(396 178)">
+      <circle r="24" class="ring" stroke="#8B9CFF"/>
+      <circle r="16" fill="#0C1230" stroke="#8B9CFF" stroke-opacity="0.45"/>
+      <g class="icon" stroke="#A8B5FF">
+        <circle cx="0" cy="0" r="5.2"/>
+        <path d="M0-11V-8.2M0 8.2V11M-11 0H-8.2M8.2 0H11M-7.8-7.8L-5.8-5.8M5.8 5.8L7.8 7.8M7.8-7.8L5.8-5.8M-5.8 5.8L-7.8 7.8"/>
+      </g>
+      <text x="0" y="52" text-anchor="middle" class="labelText" fill="#B8C0FF">PLANNER</text>
+    </g>
+
+    <g transform="translate(532 178)">
+      <circle r="24" class="ring" stroke="#6DA7FF"/>
+      <circle r="16" fill="#071A36" stroke="#6DA7FF" stroke-opacity="0.45"/>
+      <g class="icon" stroke="#93C5FD">
+        <path d="M-6.5-5L-12 0L-6.5 5"/>
+        <path d="M6.5-5L12 0L6.5 5"/>
+        <path d="M2.8-8L-2.8 8"/>
+      </g>
+      <text x="0" y="52" text-anchor="middle" class="labelText" fill="#9CCBFF">BUILDER</text>
+    </g>
+
+    <g transform="translate(668 178)">
+      <circle r="24" class="ring" stroke="#4DD7F3"/>
+      <circle r="16" fill="#062334" stroke="#4DD7F3" stroke-opacity="0.45"/>
+      <g class="icon" stroke="#7DE3F7">
+        <path d="M0-11L10-7.2V-0.8C10 6.2 5.5 10 0 12C-5.5 10-10 6.2-10-0.8V-7.2L0-11Z"/>
+        <path d="M-4 0.5L-0.8 4L5-3.6"/>
+      </g>
+      <text x="0" y="52" text-anchor="middle" class="labelText" fill="#91E8FA">REVIEWER</text>
+    </g>
+
+    <g transform="translate(804 178)">
+      <circle r="24" class="ring" stroke="#42E6D2"/>
+      <circle r="16" fill="#052D32" stroke="#42E6D2" stroke-opacity="0.45"/>
+      <g class="icon" stroke="#7EF5E6">
+        <path d="M-5-10H5"/>
+        <path d="M-2-10V-2L-8 8C-9.2 10-7.8 12  -5.5 12H5.5C7.8 12 9.2 10 8 8L2-2V-10"/>
+        <path d="M-5 5H5"/>
+        <circle cx="-2" cy="8" r="1" fill="#7EF5E6" stroke="none"/>
+      </g>
+      <text x="0" y="52" text-anchor="middle" class="labelText" fill="#8AF7EA">TESTER</text>
+    </g>
+
+    <g transform="translate(940 178)">
+      <circle r="24" class="ring" stroke="#69F0C6"/>
+      <circle r="16" fill="#063229" stroke="#69F0C6" stroke-opacity="0.45"/>
+      <g class="icon" stroke="#9AFAD8">
+        <path d="M8-4.5C5.8-8.2 1.2-10-3.1-8.5C-6.4-7.4-8.8-4.7-9.6-1.5"/>
+        <path d="M-9.8-7V-1.2H-4"/>
+        <path d="M-8 4.5C-5.8 8.2-1.2 10 3.1 8.5C6.4 7.4 8.8 4.7 9.6 1.5"/>
+        <path d="M9.8 7V1.2H4"/>
+      </g>
+      <text x="0" y="52" text-anchor="middle" class="labelText" fill="#A7F8DD">RECOVERY</text>
+    </g>
+  </g>
+
+  <text x="600" y="320" text-anchor="middle" class="subtitleText">Handoffs • Test Gates • Review Gates • Recovery Loops</text>
 </svg>

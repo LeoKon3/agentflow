@@ -2,53 +2,44 @@
   <img src="assets/agentflow-banner.svg" alt="AGENTFLOW banner" width="100%" />
 </p>
 
-# agentflow
+<h1 align="center">agentflow</h1>
 
-`agentflow` is a Claude Code skill for running disciplined multi-role coding workflows inside one Claude Code session.
+<p align="center">
+  A Claude Code skill for running disciplined, role-based coding workflows inside one Claude Code session.
+</p>
 
-It turns an open-ended assistant session into a structured flow where implementation, verification, review, routing, and final reporting stay explicit.
+<p align="center">
+  <a href="README.md"><kbd>English</kbd></a>
+  <a href="README.zh-CN.md"><kbd>中文</kbd></a>
+</p>
 
 ```txt
 Developer writes. Tester verifies. Reviewer approves. You define the flow.
 ```
 
 > [!NOTE]
-> `agentflow` is currently a Claude Code skill, not an external CLI. Role permissions such as `can_edit` and `can_run_commands` are prompt-level workflow constraints; actual tool confirmation still follows your Claude Code permission settings.
+> `agentflow` is a Claude Code skill, not an external CLI. Role permissions such as `can_edit` and `can_run_commands` are workflow constraints in the prompt; Claude Code's normal tool confirmation settings still apply.
 
 ## Why agentflow?
 
-Claude Code is powerful, but complex work benefits from separation of responsibilities. `agentflow` gives each step a clear role, handoff contract, and decision vocabulary so a task does not quietly skip testing or review.
+Claude Code can handle complex work, but larger tasks benefit from explicit handoffs, verification gates, and review gates. `agentflow` keeps each role's responsibility visible so implementation, testing, review, failure routing, and final reporting do not get skipped silently.
+
+<p align="center">
+  <img src="assets/agentflow-workflow.svg" alt="AgentFlow role-based workflow diagram" width="100%" />
+</p>
 
 Use it when you want:
 
 - built-in workflows for bug fixes, features, refactors, security work, and quick changes;
-- sequential role execution instead of one agent doing everything at once;
+- sequential role execution instead of one assistant doing every step at once;
 - required test and review gates;
-- failure routing back to the right role;
-- blocked-state reporting and resumable context;
+- failure routes back to the right role;
+- blocked-state reporting with a resumable role;
 - custom YAML workflows and custom role prompts.
-
-<p align="center">
-  <img src="assets/agentflow-workflow.svg" alt="Flowing agentflow workflow visual" width="100%" />
-</p>
-
-## Repository layout
-
-```txt
-claude/skills/agentflow/                 # publishable Claude Code skill source
-  SKILL.md                               # command behavior and workflow runner rules
-  templates/                             # built-in workflow templates
-  roles/                                 # built-in role prompts
-  examples/
-    workflow-templates/                  # copyable custom workflow examples
-    role-templates/                      # copyable custom role prompt examples
-```
-
-The local `.claude/` directory is for machine-specific Claude Code settings and local testing. It is not the product source.
 
 ## Install locally
 
-After cloning this repo, copy the skill into your Claude Code skills directory:
+Copy the skill into your Claude Code skills directory:
 
 ```bash
 cp -R claude/skills/agentflow ~/.claude/skills/
@@ -62,21 +53,9 @@ Then start Claude Code in any project and run:
 
 ## Quick start
 
-List the built-in workflow templates:
-
 ```txt
 /agentflow list
-```
-
-Inspect a workflow before running it:
-
-```txt
 /agentflow show bugfix
-```
-
-Run a built-in workflow:
-
-```txt
 /agentflow run bugfix "fix login redirect bug"
 ```
 
@@ -94,10 +73,10 @@ Run a custom workflow YAML file:
 | `/agentflow list` | Show built-in workflow templates. |
 | `/agentflow show <template>` | Show a built-in template's flow, roles, rules, and failure routes. |
 | `/agentflow validate <template.yaml>` | Validate a custom workflow YAML file without running it. |
-| `/agentflow run <template> "<task>"` | Run a built-in workflow template for a task. |
-| `/agentflow run <template.yaml> "<task>"` | Run a custom workflow YAML file for a task. |
+| `/agentflow run <template> "<task>"` | Run a built-in workflow for a task. |
+| `/agentflow run <template.yaml> "<task>"` | Run a custom workflow file for a task. |
 
-Built-in templates are addressed by name. Custom templates are addressed by explicit YAML file path.
+Built-in templates are addressed by name. Custom templates are currently addressed by explicit YAML file path.
 
 ## Built-in workflows
 
@@ -111,17 +90,17 @@ Built-in templates are addressed by name. Custom templates are addressed by expl
 
 ## Workflow decisions
 
-Roles return structured decisions that the workflow runner normalizes for routing:
+Roles return structured decisions that the workflow runner normalizes for routing.
 
-| Role type | Raw decisions | Meaning |
-| --- | --- | --- |
-| Developer | `implemented`, `blocked` | Implementation handoff is ready, or user input is needed. |
-| Tester / Regression Tester | `passed`, `failed`, `blocked` | Verification passed, repair is needed, or verification is blocked. |
-| Reviewer roles | `approved`, `changes_requested`, `blocked` | Review approved, changes are required, or review is blocked. |
+| Role type | Decisions |
+| --- | --- |
+| Developer | `implemented`, `blocked` |
+| Tester / Regression Tester | `passed`, `failed`, `blocked` |
+| Reviewer roles | `approved`, `changes_requested`, `blocked` |
 
-`failed` routes through the template's `fail_to` path when configured. `blocked` stops the workflow with a resume point so the user can provide missing information and continue from the blocked role by default.
+`failed` and `changes_requested` route through the template's `fail_to` path when configured. `blocked` stops the workflow with a resume point so the user can provide missing information and continue from the blocked role by default.
 
-## Custom workflow templates
+## Custom workflows
 
 Custom workflows are YAML files with roles, routes, a start role, and workflow rules.
 
@@ -173,14 +152,8 @@ Copyable examples live in:
 
 ```txt
 claude/skills/agentflow/examples/workflow-templates/
+claude/skills/agentflow/examples/role-templates/
 ```
-
-Included examples:
-
-- `strict-bugfix.yaml`
-- `docs-only.yaml`
-- `security-hotfix.yaml`
-- `quick-no-review.yaml`
 
 ## Custom role prompts
 
@@ -209,33 +182,20 @@ docs-writer:
   pass_to: docs-reviewer
 ```
 
-If you write a fully custom role prompt without `uses`, include:
-
-- role responsibility;
-- what the role may and must not do;
-- decision vocabulary;
-- required output structure;
-- handoff destination;
-- pass, fail, and block conditions;
-- how the role respects required test and review gates.
-
-Copyable role prompt examples live in:
-
-```txt
-claude/skills/agentflow/examples/role-templates/
-```
-
-Included examples:
-
-- `product-reviewer.md`
-- `api-reviewer.md`
-- `docs-reviewer.md`
-- `migration-reviewer.md`
+If you write a fully custom role prompt without `uses`, include the role responsibility, allowed actions, decision vocabulary, output structure, handoff destination, pass/fail/block conditions, and how the role respects test and review gates.
 
 ## Verification boundaries
 
-Developer handoffs describe what counts as core verification, what requires external or runtime access, and what is not required for the change.
+Developer handoffs describe what can be verified in the current code environment, what requires runtime or external access, and what is not required for the change. Tester and Regression Tester then decide whether the available evidence is enough to pass, fail, or block.
 
-Tester and Regression Tester then assess that boundary before deciding whether missing environment access is a passable risk or a blocker.
+## Repository layout
 
-This helps avoid unnecessary stops when, for example, the current repo can verify the core behavior but a full staging or end-to-end runtime is not available.
+```txt
+claude/skills/agentflow/                 # publishable Claude Code skill source
+  SKILL.md                               # command behavior and workflow runner rules
+  templates/                             # built-in workflow templates
+  roles/                                 # built-in role prompts
+  examples/                              # copyable workflow and role examples
+```
+
+The local `.claude/` directory is for machine-specific Claude Code settings and local testing. It is not the product source.

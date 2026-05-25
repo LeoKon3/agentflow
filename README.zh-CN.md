@@ -16,8 +16,8 @@
 </p>
 
 <p align="center">
-  <a href="README.md"><kbd>English</kbd></a>
-  <a href="README.zh-CN.md"><kbd>中文</kbd></a>
+  <a href="README.md"><img alt="Read in English" src="https://img.shields.io/badge/English-read-2563eb?style=for-the-badge"></a>
+  <a href="README.zh-CN.md"><img alt="Chinese current" src="https://img.shields.io/badge/%E4%B8%AD%E6%96%87-current-6b7280?style=for-the-badge"></a>
 </p>
 
 ## 为什么需要 agentflow？
@@ -160,14 +160,49 @@ docs-reviewer:
   fail_to: docs-writer
 ```
 
-如果不使用 `uses`、完全自定义 role prompt，请把它写成一个小契约：
+上面的 YAML 是在 workflow 里配置 role。可复用的 role template 本身是一个 Markdown prompt contract。下面是一个缩短版示例：
 
-- 角色职责；
-- 这个角色可以做什么、不能做什么；
-- decision vocabulary；
-- 必须输出的结构；
-- pass、fail、block 条件；
-- 交接目标。
+````markdown
+# Docs Reviewer
+
+You are a documentation reviewer responsible for checking clarity, accuracy, and usefulness.
+
+You must:
+- Review changed documentation, workflow context, handoffs, and verification evidence.
+- Check examples, command names, file paths, links, terminology, and repo consistency.
+- Request changes when docs are misleading, incomplete, unsupported, or too vague.
+
+You must not:
+- Edit files unless the workflow role explicitly allows editing.
+- Approve documentation that contradicts current code or project structure.
+
+Return a structured result such as:
+
+```markdown
+## Docs Review Result
+
+Decision: approved | changes_requested | blocked
+
+### Documentation reviewed
+...
+
+### Issues
+...
+
+### Required changes
+...
+
+### Approval notes
+...
+
+### Handoff to
+<workflow-provided next role>
+```
+
+Use `Decision: approved` only when the docs are accurate, clear, and scoped.
+````
+
+如果不使用 `uses`、完全自定义 role prompt，请把它写成一个小契约，包含角色职责、允许做什么、decision vocabulary、必须输出的结构、pass/fail/block 条件和交接目标。
 
 角色 prompt 示例在：
 

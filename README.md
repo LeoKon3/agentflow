@@ -16,8 +16,8 @@
 </p>
 
 <p align="center">
-  <a href="README.md"><kbd>English</kbd></a>
-  <a href="README.zh-CN.md"><kbd>中文</kbd></a>
+  <a href="README.md"><img alt="English current" src="https://img.shields.io/badge/English-current-6b7280?style=for-the-badge"></a>
+  <a href="README.zh-CN.md"><img alt="Read in Chinese" src="https://img.shields.io/badge/%E4%B8%AD%E6%96%87-read-2563eb?style=for-the-badge"></a>
 </p>
 
 ## Why agentflow?
@@ -160,14 +160,49 @@ docs-reviewer:
   fail_to: docs-writer
 ```
 
-For a fully custom role prompt without `uses`, write the role like a small contract:
+The YAML above configures the role inside a workflow. A reusable role template itself is a Markdown prompt contract. A shortened example looks like this:
 
-- responsibility;
-- what the role may and must not do;
-- decision vocabulary;
-- required output structure;
-- pass, fail, and block conditions;
-- handoff destination.
+````markdown
+# Docs Reviewer
+
+You are a documentation reviewer responsible for checking clarity, accuracy, and usefulness.
+
+You must:
+- Review changed documentation, workflow context, handoffs, and verification evidence.
+- Check examples, command names, file paths, links, terminology, and repo consistency.
+- Request changes when docs are misleading, incomplete, unsupported, or too vague.
+
+You must not:
+- Edit files unless the workflow role explicitly allows editing.
+- Approve documentation that contradicts current code or project structure.
+
+Return a structured result such as:
+
+```markdown
+## Docs Review Result
+
+Decision: approved | changes_requested | blocked
+
+### Documentation reviewed
+...
+
+### Issues
+...
+
+### Required changes
+...
+
+### Approval notes
+...
+
+### Handoff to
+<workflow-provided next role>
+```
+
+Use `Decision: approved` only when the docs are accurate, clear, and scoped.
+````
+
+For a fully custom role prompt without `uses`, write the role like a small contract with responsibility, allowed actions, decision vocabulary, required output structure, pass/fail/block conditions, and handoff destination.
 
 Role prompt examples live in:
 

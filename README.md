@@ -145,9 +145,42 @@ Role permissions such as `can_edit` and `can_run_commands` are workflow constrai
 
 ## Custom role prompts
 
-Use `uses: builtin/<role>` to reuse a built-in prompt. Add `prompt:` when a role needs extra instructions.
+Use `uses: builtin/<role>` to reuse a built-in role prompt. Add `prompt:` when the role needs extra instructions.
 
-If you write a fully custom role prompt without `uses`, include the role responsibility, allowed actions, decision vocabulary, output structure, handoff destination, pass/fail/block conditions, and how the role respects test and review gates.
+```yaml
+docs-reviewer:
+  title: Docs Reviewer
+  uses: builtin/reviewer
+  prompt: |
+    Review only documentation changes.
+    Check clarity, accuracy, broken links, and whether examples still match the workflow.
+  can_edit: false
+  can_run_commands: true
+  pass_to: done
+  fail_to: docs-writer
+```
+
+For a fully custom role prompt without `uses`, write the role like a small contract:
+
+- responsibility;
+- what the role may and must not do;
+- decision vocabulary;
+- required output structure;
+- pass, fail, and block conditions;
+- handoff destination.
+
+Role prompt examples live in:
+
+```txt
+claude/skills/agentflow/examples/role-templates/
+```
+
+Included examples:
+
+- `product-reviewer.md`
+- `api-reviewer.md`
+- `docs-reviewer.md`
+- `migration-reviewer.md`
 
 ## Verification boundaries
 

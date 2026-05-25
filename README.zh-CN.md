@@ -145,9 +145,42 @@ claude/skills/agentflow/examples/role-templates/
 
 ## 自定义角色 prompts
 
-使用 `uses: builtin/<role>` 可以复用内置 prompt。角色需要额外说明时，可以添加 `prompt:`。
+使用 `uses: builtin/<role>` 可以复用内置角色 prompt。角色需要额外说明时，可以添加 `prompt:`。
 
-如果不使用 `uses`、完全自定义角色 prompt，需要写清楚角色职责、允许做什么、decision vocabulary、输出结构、交接目标、pass/fail/block 条件，以及如何遵守测试和 review gate。
+```yaml
+docs-reviewer:
+  title: Docs Reviewer
+  uses: builtin/reviewer
+  prompt: |
+    Review only documentation changes.
+    Check clarity, accuracy, broken links, and whether examples still match the workflow.
+  can_edit: false
+  can_run_commands: true
+  pass_to: done
+  fail_to: docs-writer
+```
+
+如果不使用 `uses`、完全自定义 role prompt，请把它写成一个小契约：
+
+- 角色职责；
+- 这个角色可以做什么、不能做什么；
+- decision vocabulary；
+- 必须输出的结构；
+- pass、fail、block 条件；
+- 交接目标。
+
+角色 prompt 示例在：
+
+```txt
+claude/skills/agentflow/examples/role-templates/
+```
+
+包含示例：
+
+- `product-reviewer.md`
+- `api-reviewer.md`
+- `docs-reviewer.md`
+- `migration-reviewer.md`
 
 ## 验证边界
 

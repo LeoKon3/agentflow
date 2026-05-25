@@ -1,11 +1,18 @@
 <p align="center">
-  <img src="assets/agentflow-banner.svg" alt="AGENTFLOW banner" width="100%" />
+  <img src="assets/agentflow-banner.svg" alt="AgentFlow banner" width="100%" />
 </p>
 
 <h1 align="center">agentflow</h1>
 
 <p align="center">
-  A Claude Code skill for running disciplined, role-based coding workflows inside one Claude Code session.
+  <img alt="Claude Code" src="https://img.shields.io/badge/Claude%20Code-skill-6366f1">
+  <img alt="workflow" src="https://img.shields.io/badge/workflow-role--based-0ea5e9">
+  <img alt="gates" src="https://img.shields.io/badge/gates-test%20%7C%20review-f59e0b">
+  <img alt="recovery" src="https://img.shields.io/badge/recovery-blocked%20%2B%20repair-10b981">
+</p>
+
+<p align="center">
+  A Claude Code skill that turns one coding session into a disciplined role-based workflow with handoffs, gates, and recovery loops.
 </p>
 
 <p align="center">
@@ -13,31 +20,25 @@
   <a href="README.zh-CN.md"><kbd>中文</kbd></a>
 </p>
 
-```txt
-Developer writes. Tester verifies. Reviewer approves. You define the flow.
-```
-
-> [!NOTE]
-> `agentflow` is a Claude Code skill, not an external CLI. Role permissions such as `can_edit` and `can_run_commands` are workflow constraints in the prompt; Claude Code's normal tool confirmation settings still apply.
-
 ## Why agentflow?
 
-Claude Code can handle complex work, but larger tasks benefit from explicit handoffs, verification gates, and review gates. `agentflow` keeps each role's responsibility visible so implementation, testing, review, failure routing, and final reporting do not get skipped silently.
+Claude Code can handle complex work, but larger tasks often need explicit role boundaries, verification gates, and review gates.
+
+`agentflow` makes those boundaries visible:
+
+- Developer implements.
+- Tester verifies.
+- Reviewer approves.
+- Failed checks route back to the right role.
+- Blocked roles report what is missing and where to resume.
 
 <p align="center">
   <img src="assets/agentflow-workflow.svg" alt="AgentFlow role-based workflow diagram" width="100%" />
 </p>
 
-Use it when you want:
+## Quick start
 
-- built-in workflows for bug fixes, features, refactors, security work, and quick changes;
-- sequential role execution instead of one assistant doing every step at once;
-- required test and review gates;
-- failure routes back to the right role;
-- blocked-state reporting with a resumable role;
-- custom YAML workflows and custom role prompts.
-
-## Install locally
+Requires Claude Code with skill support.
 
 Copy the skill into your Claude Code skills directory:
 
@@ -45,13 +46,7 @@ Copy the skill into your Claude Code skills directory:
 cp -R claude/skills/agentflow ~/.claude/skills/
 ```
 
-Then start Claude Code in any project and run:
-
-```txt
-/agentflow list
-```
-
-## Quick start
+Then start Claude Code in any project:
 
 ```txt
 /agentflow list
@@ -66,31 +61,31 @@ Run a custom workflow YAML file:
 /agentflow run ./claude/skills/agentflow/examples/workflow-templates/strict-bugfix.yaml "fix login redirect bug"
 ```
 
+## Built-in workflows
+
+| Template | Flow | Use when |
+| --- | --- | --- |
+| `bugfix` | Investigator → Developer → Tester → Reviewer | You need root cause, fix, tests, and review. |
+| `feature` | Architect → Developer → Tester → Reviewer | You need a small plan before implementation. |
+| `refactor` | Architect → Developer → Regression Tester → Reviewer | Behavior should stay unchanged. |
+| `security` | Developer → Security Reviewer → Tester → Senior Reviewer | Auth, tokens, permissions, webhooks, or payment boundaries are involved. |
+| `quick` | Developer → Tester | The change is small but still needs verification. |
+
 ## Commands
 
 | Command | Purpose |
 | --- | --- |
-| `/agentflow list` | Show built-in workflow templates. |
-| `/agentflow show <template>` | Show a built-in template's flow, roles, rules, and failure routes. |
-| `/agentflow validate <template.yaml>` | Validate a custom workflow YAML file without running it. |
-| `/agentflow run <template> "<task>"` | Run a built-in workflow for a task. |
-| `/agentflow run <template.yaml> "<task>"` | Run a custom workflow file for a task. |
+| `/agentflow list` | Show built-in workflows. |
+| `/agentflow show <template>` | Inspect a workflow. |
+| `/agentflow validate <template.yaml>` | Validate a custom workflow file. |
+| `/agentflow run <template> "<task>"` | Run a built-in workflow. |
+| `/agentflow run <template.yaml> "<task>"` | Run a custom workflow file. |
 
 Built-in templates are addressed by name. Custom templates are currently addressed by explicit YAML file path.
 
-## Built-in workflows
-
-| Template | Flow | Best for |
-| --- | --- | --- |
-| `bugfix` | Investigator → Developer → Tester → Reviewer | Debugging and fixing defects with final review. |
-| `feature` | Architect → Developer → Tester → Reviewer | Adding behavior with design, implementation, verification, and review. |
-| `refactor` | Architect → Developer → Regression Tester → Reviewer | Behavior-preserving changes with regression focus. |
-| `security` | Developer → Security Reviewer → Tester → Senior Reviewer | Security-sensitive changes with senior approval. |
-| `quick` | Developer → Tester | Small changes that still need independent verification. |
-
 ## Workflow decisions
 
-Roles return structured decisions that the workflow runner normalizes for routing.
+Each role returns a structured decision used for routing.
 
 | Role type | Decisions |
 | --- | --- |
@@ -98,7 +93,9 @@ Roles return structured decisions that the workflow runner normalizes for routin
 | Tester / Regression Tester | `passed`, `failed`, `blocked` |
 | Reviewer roles | `approved`, `changes_requested`, `blocked` |
 
-`failed` and `changes_requested` route through the template's `fail_to` path when configured. `blocked` stops the workflow with a resume point so the user can provide missing information and continue from the blocked role by default.
+`failed` and `changes_requested` route to the configured `fail_to` role.
+
+`blocked` stops with a resume point so the user can provide missing information and continue from the blocked role.
 
 ## Custom workflows
 
@@ -106,25 +103,15 @@ Custom workflows are YAML files with roles, routes, a start role, and workflow r
 
 ```yaml
 name: strict-bugfix
-description: Debug and fix a defect with investigation, testing, and final review gates.
 
 roles:
-  investigator:
-    title: Investigator
-    uses: builtin/investigator
-    can_edit: false
-    can_run_commands: true
-    pass_to: developer
-
   developer:
-    title: Developer
     uses: builtin/developer
     can_edit: true
     can_run_commands: true
     pass_to: tester
 
   tester:
-    title: Tester
     uses: builtin/tester
     can_edit: true
     can_run_commands: true
@@ -132,7 +119,6 @@ roles:
     fail_to: developer
 
   reviewer:
-    title: Reviewer
     uses: builtin/reviewer
     can_edit: false
     can_run_commands: true
@@ -140,7 +126,7 @@ roles:
     fail_to: developer
 
 flow:
-  start: investigator
+  start: developer
 
 rules:
   max_loops: 2
@@ -148,39 +134,18 @@ rules:
   require_final_review: true
 ```
 
-Copyable examples live in:
+More examples:
 
 ```txt
 claude/skills/agentflow/examples/workflow-templates/
 claude/skills/agentflow/examples/role-templates/
 ```
 
+Role permissions such as `can_edit` and `can_run_commands` are workflow constraints in the prompt. Claude Code's normal tool confirmation settings still apply.
+
 ## Custom role prompts
 
-A role can use a built-in prompt:
-
-```yaml
-developer:
-  title: Developer
-  uses: builtin/developer
-  can_edit: true
-  can_run_commands: true
-  pass_to: tester
-```
-
-A role can also combine a built-in prompt with extra instructions:
-
-```yaml
-docs-writer:
-  title: Docs Writer
-  uses: builtin/developer
-  prompt: |
-    Focus only on documentation changes.
-    Keep edits concise, accurate, and scoped to the user's request.
-  can_edit: true
-  can_run_commands: true
-  pass_to: docs-reviewer
-```
+Use `uses: builtin/<role>` to reuse a built-in prompt. Add `prompt:` when a role needs extra instructions.
 
 If you write a fully custom role prompt without `uses`, include the role responsibility, allowed actions, decision vocabulary, output structure, handoff destination, pass/fail/block conditions, and how the role respects test and review gates.
 

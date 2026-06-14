@@ -93,14 +93,16 @@ Or place a project template at `.agentflow/templates/strict-bugfix.yaml` and run
 
 ## Commands
 
-| Command                                   | Purpose                              |
-| ----------------------------------------- | ------------------------------------ |
-| `/agentflow list`                         | Show built-in and project workflows. |
-| `/agentflow show <template>`              | Inspect a workflow.                  |
-| `/agentflow validate <template>`          | Validate a workflow template.        |
-| `/agentflow role <role> "<task>"`         | Run one built-in role only.          |
-| `/agentflow run <template> "<task>"`      | Run a workflow by name.              |
-| `/agentflow run <template.yaml> "<task>"` | Run a workflow file by path.         |
+| Command                                   | Purpose                                       |
+| ----------------------------------------- | --------------------------------------------- |
+| `/agentflow list`                         | Show built-in and project workflows.          |
+| `/agentflow show <template>`              | Inspect a workflow.                           |
+| `/agentflow validate <template>`          | Validate a workflow template.                 |
+| `/agentflow role <role> "<task>"`         | Run one built-in role only.                   |
+| `/agentflow run <template> "<task>"`      | Run a workflow by name.                       |
+| `/agentflow run <template.yaml> "<task>"` | Run a workflow file by path.                  |
+| `/agentflow resume`                       | Resume the most recent blocked workflow.      |
+| `/agentflow resume <run-id>`              | Resume a specific blocked workflow by run ID. |
 
 Single-role mode is for focused investigation, design, implementation, testing, or review. It reports only that role's decision; it does not mark a workflow passed or bypass test/review gates.
 

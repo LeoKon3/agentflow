@@ -26,6 +26,8 @@ Supported commands:
 /agentflow role <role> "<task>"
 /agentflow run <template> "<task>"
 /agentflow run <template.yaml> "<task>"
+/agentflow resume
+/agentflow resume <run-id>
 ```
 
 Template resolution:
@@ -73,12 +75,27 @@ Use this format:
 Project templates:
 - strict-bugfix    .agentflow/templates/strict-bugfix.yaml
 
-Built-in templates:
-- bugfix           Investigator → Developer → Tester → Reviewer
-- feature          Architect → Developer → Tester → Reviewer
-- refactor         Architect → Developer → Regression Tester → Reviewer
-- security         Developer → Security Reviewer → Tester → Senior Reviewer
-- quick            Developer → Tester
+Built-in workflows:
+
+  bugfix           Investigator → Developer → Tester → Reviewer
+                   Use when: Diagnosing and fixing a known defect
+                   Example: /agentflow run bugfix "fix OAuth redirect loop after login"
+
+  feature          Architect → Developer → Tester → Reviewer
+                   Use when: Building new behavior or functionality
+                   Example: /agentflow run feature "add export to CSV for reports table"
+
+  refactor         Architect → Developer → Regression Tester → Reviewer
+                   Use when: Changing structure while proving behavior stays the same
+                   Example: /agentflow run refactor "split billing service into microservices"
+
+  security         Developer → Security Reviewer → Tester → Senior Reviewer
+                   Use when: Modifying security-sensitive code or adding auth/permissions
+                   Example: /agentflow run security "add rate limiting to public API endpoints"
+
+  quick            Developer → Tester
+                   Use when: Small implementation with focused verification, no review gate
+                   Example: /agentflow run quick "add debug logging to payment webhook"
 ```
 
 If no project templates exist, show `Project templates: none`.
@@ -172,8 +189,95 @@ Execution rules:
 10. Route using `pass_to` or `fail_to`.
 11. Enforce `rules.max_loops`.
 12. Stop as `blocked` when the next safe action requires user intervention, preserving a resume point for the blocked role.
-13. After user input resolves a blocker, resume from the blocked role by default unless the new information changes requirements, design, or implementation direction.
-14. End with a final report.
+13. Save blocked workflow state to `.agentflow/runs/<run-id>.json` including workflow name, task, blocked role, blocker reason, workflow state, timeline, and all prior handoffs.
+14. After user input resolves a blocker, resume from the blocked role by default unless the new information changes requirements, design, or implementation direction.
+15. End with a final report.
+
+## `/agentflow resume`
+
+Resume a blocked workflow from the most recent blocked run in the current project, or from a specific run ID.
+
+Usage:
+
+```txt
+/agentflow resume
+/agentflow resume <run-id>
+```
+
+Execution rules:
+
+1. If no `<run-id>` is provided, search `.agentflow/runs/*.json` for the most recent blocked run (sorted by timestamp).
+2. If `<run-id>` is provided, load `.agentflow/runs/<run-id>.json`.
+3. If no blocked run is found, report that no blocked workflow exists and show how to start a new workflow.
+4. Load the saved workflow state including template name, task, blocked role, blocker reason, workflow state, timeline, and prior handoffs.
+5. Show the blocked workflow summary and ask the user to provide missing information or clarify the blocker.
+6. After the user responds, determine the resume action:
+   - `resume_current_role`: continue from the blocked role with user-provided context
+   - `route_to_configured_fail_to`: route backward if the new information reveals a problem in prior work
+   - `rerun_workflow`: restart from the beginning if prior state is no longer reliable
+   - `abort`: stop and mark the workflow as abandoned
+7. Execute the chosen resume action and continue the workflow from that point.
+8. Update the run state file with the resume action and new timeline entries.
+9. If the workflow completes or blocks again, save the final state and end with a final report.
+
+Blocked workflow state file format (`.agentflow/runs/<run-id>.json`):
+
+```json
+{
+  "run_id": "2026-05-25-bugfix-login-redirect-a3f8",
+  "workflow": "bugfix",
+  "task": "fix OAuth redirect loop after login",
+  "status": "blocked",
+  "blocked_role": "tester",
+  "blocker_reason": "missing test database credentials",
+  "required_user_input": ["provide DB_TEST_URL or skip external database tests"],
+  "recommended_resume_action": "resume_current_role",
+  "timestamp": "2026-05-25T14:32:10Z",
+  "loop_count": 1,
+  "max_loops": 3,
+  "workflow_state": {
+    "investigator": "passed",
+    "developer": "passed",
+    "tester": "blocked"
+  },
+  "timeline": [
+    {"role": "investigator", "decision": "passed", "timestamp": "2026-05-25T14:28:00Z"},
+    {"role": "developer", "decision": "implemented", "normalized": "passed", "timestamp": "2026-05-25T14:30:45Z"},
+    {"role": "tester", "decision": "blocked", "timestamp": "2026-05-25T14:32:10Z"}
+  ],
+  "handoffs": {
+    "investigator": "...",
+    "developer": "..."
+  }
+}
+```
+
+When resuming, show:
+
+```txt
+Resuming blocked workflow: bugfix
+Run ID: 2026-05-25-bugfix-login-redirect-a3f8
+Task: fix OAuth redirect loop after login
+
+Blocked at: Tester
+Reason: missing test database credentials
+Required: provide DB_TEST_URL or skip external database tests
+
+Timeline so far:
+  ✓ Investigator (passed)
+  ✓ Developer (implemented)
+  ⏸ Tester (blocked)
+
+Please provide the missing information, or describe what changed since the workflow blocked.
+```
+
+After the user responds, decide whether to:
+- Resume from Tester with new context
+- Route back to Developer if the user's input reveals the implementation was wrong
+- Rerun from the start if the original task understanding was incorrect
+- Abort if the workflow is no longer needed
+
+If the workflow successfully resumes and completes, update the run state file with `"status": "passed"` or `"status": "failed"` and archive it.
 
 ## Workflow controller responsibilities
 
@@ -406,6 +510,7 @@ Every workflow run must end with:
 ## agentflow result
 
 Workflow: <name>
+Run ID: <run-id>
 Status: passed | failed | blocked
 Loops: <loop_count>/<max_loops>
 
@@ -444,18 +549,17 @@ For failed or blocked workflows, include:
 For blocked workflows, also include:
 
 ```markdown
-### Blocked resume point
-Role: <blocked role>
+### Resume
+Run ID: <run-id>
+Blocked at: <blocked role>
 Reason: <why blocked>
 Required user input:
 - ...
-Recommended resume action: resume_current_role | route_to_configured_fail_to | rerun_workflow | abort
 
-### Possible resume actions
-- Continue current role after user input
-- Route to the configured failure route when backward routing is required
-- Rerun workflow from start
-- Stop workflow
+To continue this workflow after providing the required information:
+/agentflow resume
+or
+/agentflow resume <run-id>
 ```
 
 Do not claim completion unless required test and review gates have passed or the selected template legitimately ends without final review.

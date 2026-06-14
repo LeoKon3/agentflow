@@ -93,14 +93,16 @@ cp -R skills/agentflow ~/.claude/skills/
 
 ## 命令
 
-| 命令                                      | 作用                       |
-| ----------------------------------------- | -------------------------- |
-| `/agentflow list`                         | 查看内置和项目 workflows。 |
-| `/agentflow show <template>`              | 查看 workflow 细节。       |
-| `/agentflow validate <template>`          | 校验 workflow 模板。       |
-| `/agentflow role <role> "<task>"`         | 只运行一个内置角色。       |
-| `/agentflow run <template> "<task>"`      | 按名称运行 workflow。      |
-| `/agentflow run <template.yaml> "<task>"` | 按路径运行 workflow 文件。 |
+| 命令                                      | 作用                                 |
+| ----------------------------------------- | ------------------------------------ |
+| `/agentflow list`                         | 查看内置和项目 workflows。           |
+| `/agentflow show <template>`              | 查看 workflow 细节。                 |
+| `/agentflow validate <template>`          | 校验 workflow 模板。                 |
+| `/agentflow role <role> "<task>"`         | 只运行一个内置角色。                 |
+| `/agentflow run <template> "<task>"`      | 按名称运行 workflow。                |
+| `/agentflow run <template.yaml> "<task>"` | 按路径运行 workflow 文件。           |
+| `/agentflow resume`                       | 恢复最近一次 blocked 的 workflow。   |
+| `/agentflow resume <run-id>`              | 按 run ID 恢复特定 blocked workflow。|
 
 Single-role mode 适合单独做调查、设计、实现、测试或 review。它只返回该角色的 decision，不会把整个 workflow 标记为 passed，也不会绕过测试或 review gates。
 
